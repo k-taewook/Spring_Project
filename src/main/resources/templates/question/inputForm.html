@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        .filedError {
+            color: #e20b1d
+        }
+    </style>
 </head>
 <body>
     <div class="container my-3">
         <h1>질문 등록</h1>
-        <form th:action="@{/question/create}" method="post">
+        <form th:action="@{/question/create}" method="post" th:object="${questionDto}">
             <div class="mb-3">
                 <label for="subject" class="form-label">제목</label>
-                <input type="text" class="form-control" id="subject" name="subject" placeholder="제목을 입력하세요">
+                <input type="text" class="form-control" id="subject" name="subject" th:field="*{subject}" placeholder="제목을 입력하세요">
+                <p class="filedError" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">error</p>
             </div>
             <div class="mb-3">
                 <label for="content" class="form-label">내용</label>
-                <textarea class="form-control" id="content" name="content" rows="10" placeholder="내용을 입력하세요"></textarea>
+                <textarea class="form-control" id="content" name="content" th:field="*{content}" rows="10" placeholder="내용을 입력하세요"></textarea>
+                <p class="filedError" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">error</p>
             </div>
             <button type="submit" class="btn btn-primary">질문 저장</button>
         </form>

@@ -4,22 +4,45 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        .filedError {
+            color: #e20b1d
+        }
+    </style>
 </head>
 <body>
-    <h1 th:text="${question.subject}">상세 페이지</h1>
-    <div th:text="${question.content}"></div>
-    <h5 th:text="|${#lists.size(question.answerList)} 개의 답변이 있습니다.|"></h5>
+    <div class="container my-3">
+        <h2 th:text="${question.subject}">상세 페이지</h2>
+        <div class="card my-3 bg-warning bg-opacity-25">
+            <div class="card-body">
+                <div class="card-text" th:text="${question.content}"></div>
+                <div class="d-flex justify-content-end">
+                    <div class="badge bg-danger text-white p-2 text-start mx-3">
+                        <div th:text="${#temporals.format(question.created, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div>
-        <ul>
-            <li th:each="answer : ${question.answerList}" th:text="${answer.content}"></li>
-        </ul>
+        <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)} 개의 답변이 있습니다.|"></h5>
+
+        <div class="card my-3" th:each="answer : ${question.answerList}">
+            <div class="card-body">
+                <div class="card-text" th:text="${answer.content}"></div>
+                <div class="d-flex justify-content-end">
+                    <div class="badge bg-light text-dark p-2 text-start mx-3">
+                        <div th:text="${#temporals.format(answer.created, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--    변수면 $, 아니면 @-->
+        <form th:object="${answerDto}" class="my-3" th:action="@{|/answer/create/${question.id}|}" method="post">
+            <textarea th:field="*{content}" class="form-control" id="content" name="content" rows="7"></textarea>
+            <p class="filedError" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">error</p>
+            <input class="btn btn-primary my-3" type="submit" value="답변 등록">
+        </form>
     </div>
-
-<!--    변수면 $, 아니면 @-->
-    <form th:action="@{|/answer/create/${question.id}|}" method="post">
-        <textarea id="content" name="content" rows="15"></textarea>
-        <input type="submit" value="답변 등록">
-    </form>
 </body>
 </html>
