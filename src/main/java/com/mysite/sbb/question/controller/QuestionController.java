@@ -3,11 +3,11 @@ package com.mysite.sbb.question.controller;
 import com.mysite.sbb.answer.dto.AnswerDto;
 import com.mysite.sbb.question.dto.QuestionDto;
 import com.mysite.sbb.question.entity.Question;
-import com.mysite.sbb.question.repository.QuestionRepository;
 import com.mysite.sbb.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,10 +26,10 @@ public class QuestionController {
 
 
     @GetMapping("/list")
-    public String list(Model model){
-        List<Question> questionList = questionService.getList();
-//        log.info("==============> list: {}", questionList);
-        model.addAttribute("questionList", questionList);
+    public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page){
+        Page<Question> paging = questionService.getList(page);
+        log.info("==============> paging: {}", paging);
+        model.addAttribute("paging", paging);
         return "question/list";
     }
 

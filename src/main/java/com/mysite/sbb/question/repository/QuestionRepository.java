@@ -13,9 +13,8 @@ import java.util.Optional;
 // Repository는 DB의 CRUD를 해주는 것
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
-//    Question findBySubject(String subject);
-//
-//    List<Question> findBySubjectLike(String subject);
-//
-//    Page<Question> findAll(Pageable pageable);
+    Optional<Question> findBySubjectLike(String keyword);
+
+    Page<Question> findAll(Pageable pageable);
+
 }
