@@ -2,10 +2,14 @@ package com.mysite.sbb.question.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data                                   // getter, setter, ToString 등등 모든 기능 있음
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class QuestionDto {
 

@@ -6,21 +6,39 @@
     <div layout:fragment="content" class="container my-3">
         <div class="container my-3">
             <h2>질문 리스트</h2>
+            <div class="row my-3">
+                <div class="col-6">
+                    <a th:href="@{/question/create}" class="btn btn-primary">질문 등록</a>
+                </div>
+                <div class="col-6">
+                    <div class="input-group">
+                        <input th:type="text" id="search_keyword" class="form-control" th:value="${keyword}">
+                        <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                    </div>
+                </div>
+            </div>
             <table class="table table-striped">
                 <thead class="table-dark">
-                <tr>
+                <tr class="text-center">
                     <th>번호</th>
                     <th>제목</th>
+                    <th>작성자</th>
                     <th>작성일</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="question, loop : ${paging}">
-                    <td th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
+                    <td class="text-center" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
                     <td>
                         <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}"></a>
+                        <span class="badge bg-primary" th:if="${#lists.size(question.answerList) > 0}"
+                              th:text="${#lists.size(question.answerList)}">
+                        </span>
                     </td>
-                    <td th:text="${#temporals.format(question.created, 'yyyy-MM-dd HH:mm:ss')}">날짜1</td>
+                    <td class="text-center">
+                        <span th:text="${question.author.username}"></span>
+                    </td>
+                    <td class="text-center" th:text="${#temporals.format(question.created, 'yyyy-MM-dd HH:mm:ss')}">날짜1</td>
                 </tr>
                 </tbody>
             </table>
@@ -68,11 +86,12 @@
                 </th:block>
             </div>
 
-            <form th:action="@{/question/list}" method="get" id="searchFrom">
+            <form th:action="@{/question/list}" method="get" id="searchForm">
                 <input type="hidden" id="page" name="page" th:value="${paging.number}">
+                <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
             </form>
 
-            <a th:href="@{/question/create}" class="btn btn-primary">질문 등록</a>
+
         </div>
     </div>
 
@@ -81,8 +100,23 @@
     Array.from(page_elements).forEach(function(element) {
         element.addEventListener("click", function(event) {
             document.getElementById("page").value = this.dataset.page;
-            document.getElementById("searchFrom").submit();
+            document.getElementById("searchForm").submit();
         })
     })
+
+    // 찾기 버튼 클릭
+    $("#btn_search").on("click", function () {
+        $("#keyword").val($("#search_keyword").val());
+        $("#page").val(0); // 검색버튼 클릭 시 0페이지부터 조회
+        $("#searchForm").submit();
+    });
+
+    // 엔터키 눌렀을 때 찾기 버튼 클릭
+    $("#search_keyword").on("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault(); // 폼 자동 제출 방지
+            $("#btn_search").click(); // 찾기 버튼 클릭과 동일 동작
+        }
+    });
 </script>
 </html>
