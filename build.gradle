@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.mysite'
 version = '0.0.1-SNAPSHOT'
-description = '스프링 게시판 만들기'
+description = '이력서/자소서 상호 첨삭 플랫폼'
 
 java {
 	toolchain {

@@ -1,8 +1,9 @@
 package com.mysite.career.review.resume.entity;
 
-import com.mysite.career.review.answer.entity.Answer;
 import com.mysite.career.review.audit.BaseEntity;
-import com.mysite.career.review.member.entity.Member;
+import com.mysite.career.review.feedback.entity.Feedback;
+import com.mysite.career.review.user.entity.User;
+import com.mysite.career.review.resume.constant.ResumeStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,19 +20,26 @@ import java.util.List;
 public class Resume extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")
+    @Column(name = "resume_id")
     private Long id; //아이디
 
     @Column(length = 200, nullable = false)
-    private String subject; // 제목
+    private String subject; // 지원 분야/제목
 
     @Column(columnDefinition = "TEXT")
-    private String content; // 질문내용
+    private String content; // 자소서 본문
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "question", cascade = CascadeType.ALL)
-    private List<Answer> answerList; // 보이진 않지만 answer를 보기 위해 answer을 불러올 때 List 타입으로 가져온다. 라는 의미
+    @Column(length = 100)
+    private String targetCompany; // 지원 목표 기업
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private ResumeStatus status; // 진행 상태
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "resume", cascade = CascadeType.ALL)
+    private List<Feedback> feedbackList; // 피드백 리스트
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id",  nullable = false)
-    private Member author;
+    @JoinColumn(name = "user_id",  nullable = false)
+    private User author;
 }

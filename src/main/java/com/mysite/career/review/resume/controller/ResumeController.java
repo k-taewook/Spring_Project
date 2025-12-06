@@ -1,8 +1,8 @@
 package com.mysite.career.review.resume.controller;
 
-import com.mysite.career.review.answer.dto.AnswerDto;
-import com.mysite.career.review.member.entity.Member;
-import com.mysite.career.review.member.service.MemberService;
+import com.mysite.career.review.feedback.dto.FeedbackDto;
+import com.mysite.career.review.user.entity.User;
+import com.mysite.career.review.user.service.UserService;
 import com.mysite.career.review.resume.dto.ResumeDto;
 import com.mysite.career.review.resume.entity.Resume;
 import com.mysite.career.review.resume.service.ResumeService;
@@ -22,17 +22,17 @@ import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping(value = "/question")
+@RequestMapping(value = "/resume")
 @Slf4j
 public class ResumeController {
 
     private final ResumeService resumeService;
-    private final MemberService memberService;
+    private final UserService userService;
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String modify(@PathVariable("id") Long id, Principal principal) {
-        Resume resume = resumeService.getQuestion(id);
+        Resume resume = resumeService.getResume(id);
 
         if(!resume.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
@@ -40,7 +40,7 @@ public class ResumeController {
 
         resumeService.delete(resume);
 
-        return "redirect:/question/lsit";
+        return "redirect:/resume/list";
 
     }
 
@@ -49,10 +49,10 @@ public class ResumeController {
     public String modify(@PathVariable("id") Long id, @Valid ResumeDto resumeDto, BindingResult bindingResult, Principal principal) {
 
         if(bindingResult.hasErrors()) {
-            return "question/inputForm";
+            return "resume/inputForm";
         }
 
-        Resume resume = resumeService.getQuestion(id);
+        Resume resume = resumeService.getResume(id);
 
         if(!resume.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
@@ -60,14 +60,14 @@ public class ResumeController {
 
         resumeService.modify(resume, resumeDto);
 
-        return "redirect:/question/detail/" + id;
+        return "redirect:/resume/detail/" + id;
 
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String modify(@PathVariable("id") Long id, ResumeDto resumeDto, Principal principal) {
-        Resume resume = resumeService.getQuestion(id);
+        Resume resume = resumeService.getResume(id);
 
         if(!resume.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
@@ -75,8 +75,10 @@ public class ResumeController {
 
         resumeDto.setSubject(resume.getSubject());
         resumeDto.setContent(resume.getContent());
+        resumeDto.setTargetCompany(resume.getTargetCompany());
+        resumeDto.setStatus(resume.getStatus());
 
-        return "question/inputForm";
+        return "resume/inputForm";
     }
 
 
@@ -89,23 +91,23 @@ public class ResumeController {
 
         Page<Resume> paging = resumeService.getList(page, keyword);
         model.addAttribute("paging", paging);
-        return "question/list";
+        return "resume/list";
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable("id") Long id, Model model, AnswerDto answerDto){
+    public String detail(@PathVariable("id") Long id, Model model, FeedbackDto feedbackDto){
         log.info("==============> id : {}", id);
-        Resume resume = resumeService.getQuestion(id);
-        model.addAttribute("question", resume);
-        model.addAttribute("answerDto", answerDto);
-        log.info("==============> question : {}", resume);
-        return "question/detail";
+        Resume resume = resumeService.getResume(id);
+        model.addAttribute("resume", resume);
+        model.addAttribute("feedbackDto", feedbackDto);
+        log.info("==============> resume : {}", resume);
+        return "resume/detail";
     }
 
     @GetMapping("/create")
     public String createQuestion(ResumeDto resumeDto, Model model){
-        model.addAttribute("questionDto", resumeDto);
-        return "question/inputForm";
+        model.addAttribute("resumeDto", resumeDto);
+        return "resume/inputForm";
     }
 
     @PostMapping("/create")
@@ -113,15 +115,15 @@ public class ResumeController {
         log.info("==============> {}", resumeDto);
 
         if(bindingResult.hasErrors()){
-            return "question/inputForm";
+            return "resume/inputForm";
         }
 
         log.info("==============> principal : {}", principal.getName());
 
-        Member member = memberService.getMember(principal.getName());
+        User user = userService.getUser(principal.getName());
 
-        resumeService.create(resumeDto, member);
+        resumeService.create(resumeDto, user);
 
-        return "redirect:/question/list";
+        return "redirect:/resume/list";
     }
 }

@@ -22,14 +22,14 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
     @Query(value =
             "SELECT distinct q "
             + "FROM Resume q "
-            + "LEFT OUTER JOIN Member m1 ON q.author = m1 "
-            + "LEFT OUTER JOIN Answer a ON a.question = q "
-            + "LEFT OUTER JOIN Member m2 ON a.author = m2 "
+            + "LEFT OUTER JOIN User m1 ON q.author = m1 "
+            + "LEFT OUTER JOIN Feedback f ON f.resume = q "
+            + "LEFT OUTER JOIN User m2 ON f.author = m2 "
             + "WHERE q.subject LIKE %:keyword% "
             + "OR q.content LIKE %:keyword% "
             + "OR m1.username LIKE %:keyword% "
             + "OR m2.username LIKE %:keyword% "
-            + "OR a.content LIKE %:keyword% "
+            + "OR f.content LIKE %:keyword% "
             , nativeQuery = false)
     Page<Resume> findAllByKeyword(String keyword, Pageable pageable);
 }

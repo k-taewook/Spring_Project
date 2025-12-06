@@ -1,5 +1,6 @@
 package com.mysite.career.review.resume.dto;
 
+import com.mysite.career.review.resume.constant.ResumeStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,4 +20,8 @@ public class ResumeDto {
 
     @NotEmpty(message = "내용은 필수 항목 입니다.")
     private String content;
+
+    private String targetCompany;
+
+    private ResumeStatus status;
 }
