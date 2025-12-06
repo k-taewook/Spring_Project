@@ -1,13 +1,10 @@
 package com.mysite.sbb.question.service;
 
-import com.mysite.sbb.member.entity.Member;
-import com.mysite.sbb.question.dto.QuestionDto;
+import com.mysite.resume_clinic.question.dto.QuestionDto;
+import com.mysite.resume_clinic.question.service.QuestionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class QuestionServiceTest {
