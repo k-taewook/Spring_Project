@@ -8,7 +8,7 @@
             <h2>질문 리스트</h2>
             <div class="row my-3">
                 <div class="col-6">
-                    <a th:href="@{/question/create}" class="btn btn-primary">질문 등록</a>
+                    <a th:href="@{/resume/create}" class="btn btn-primary">질문 등록</a>
                 </div>
                 <div class="col-6">
                     <div class="input-group">
@@ -27,18 +27,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="question, loop : ${paging}">
+                <tr th:each="resume, loop : ${paging}">
                     <td class="text-center" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
                     <td>
-                        <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}"></a>
-                        <span class="badge bg-primary" th:if="${#lists.size(question.answerList) > 0}"
-                              th:text="${#lists.size(question.answerList)}">
+                        <a th:href="@{|/resume/detail/${resume.id}|}" th:text="${resume.subject}"></a>
+                        <span class="badge bg-primary" th:if="${#lists.size(resume.answerList) > 0}"
+                              th:text="${#lists.size(resume.answerList)}">
                         </span>
                     </td>
                     <td class="text-center">
-                        <span th:text="${question.author.username}"></span>
+                        <span th:text="${resume.author.username}"></span>
                     </td>
-                    <td class="text-center" th:text="${#temporals.format(question.created, 'yyyy-MM-dd HH:mm:ss')}">날짜1</td>
+                    <td class="text-center" th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm:ss')}">날짜1</td>
                 </tr>
                 </tbody>
             </table>
@@ -86,7 +86,7 @@
                 </th:block>
             </div>
 
-            <form th:action="@{/question/list}" method="get" id="searchForm">
+            <form th:action="@{/resume/list}" method="get" id="searchForm">
                 <input type="hidden" id="page" name="page" th:value="${paging.number}">
                 <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
             </form>
