@@ -26,5 +26,10 @@ public class ResumeDto {
 
     private ResumeStatus status;
 
+    private Long id;
+
     private MultipartFile resumeFile;
+
+    private String originalFileName;
+    private String originalFilePath;
 }

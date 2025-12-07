@@ -73,7 +73,30 @@ public class ResumeService {
         resumeRepository.save(resume);              // insert
     }
 
-    public void modify(Resume resume, @Valid ResumeDto resumeDto) {
+    public void modify(Resume resume, @Valid ResumeDto resumeDto) throws IOException {
+        String projectPath = System.getProperty("user.dir") + "\\files\\";
+        UUID uuid = UUID.randomUUID();
+        String fileName = "";
+        String filePath = "";
+
+        if (resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty()) {
+            // 기존 파일 삭제 (선택 사항, 여기서는 덮어쓰기 개념으로 새 파일만 저장)
+            // if (resume.getFilePath() != null) { ... }
+
+            fileName = uuid + "_" + resumeDto.getResumeFile().getOriginalFilename();
+            File saveFile = new File(projectPath, fileName);
+
+            if (!saveFile.getParentFile().exists()) {
+                saveFile.getParentFile().mkdirs();
+            }
+
+            resumeDto.getResumeFile().transferTo(saveFile);
+            filePath = "/files/" + fileName;
+
+            resume.setFileName(resumeDto.getResumeFile().getOriginalFilename());
+            resume.setFilePath(filePath);
+        }
+
         resume.setSubject(resumeDto.getSubject());
         resume.setContent(resumeDto.getContent());
         resume.setTargetCompany(resumeDto.getTargetCompany());

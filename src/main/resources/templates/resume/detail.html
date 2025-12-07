@@ -24,7 +24,7 @@
                 
                 <div class="my-3" th:if="${resume.filePath != null}">
                     <label class="form-label fw-bold">첨부 파일:</label>
-                    <a th:href="@{|${resume.filePath}|}" class="btn btn-sm btn-outline-dark" th:text="${resume.fileName}" download></a>
+                    <a th:href="@{|/resume/download/${resume.id}|}" class="btn btn-sm btn-outline-dark" th:text="${resume.fileName}"></a>
                 </div>
 
                 <div class="d-flex justify-content-end">

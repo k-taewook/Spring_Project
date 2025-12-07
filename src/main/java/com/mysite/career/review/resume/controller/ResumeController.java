@@ -20,6 +20,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.io.IOException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.util.UriUtils;
+import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
 
 @Controller
 @RequiredArgsConstructor
@@ -47,9 +54,13 @@ public class ResumeController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
-    public String modify(@PathVariable("id") Long id, @Valid ResumeDto resumeDto, BindingResult bindingResult, Principal principal) {
+    public String modify(@PathVariable("id") Long id, @Valid @ModelAttribute ResumeDto resumeDto, BindingResult bindingResult, Principal principal) throws IOException {
 
         if(bindingResult.hasErrors()) {
+            Resume resume = resumeService.getResume(id);
+            resumeDto.setOriginalFileName(resume.getFileName());
+            resumeDto.setOriginalFilePath(resume.getFilePath());
+            resumeDto.setId(resume.getId());
             return "resume/inputForm";
         }
 
@@ -78,8 +89,25 @@ public class ResumeController {
         resumeDto.setContent(resume.getContent());
         resumeDto.setTargetCompany(resume.getTargetCompany());
         resumeDto.setStatus(resume.getStatus());
+        resumeDto.setOriginalFileName(resume.getFileName());
+        resumeDto.setOriginalFilePath(resume.getFilePath());
+        resumeDto.setId(resume.getId());
 
         return "resume/inputForm";
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Resource> download(@PathVariable("id") Long id) throws MalformedURLException {
+        Resume resume = resumeService.getResume(id);
+        String fullPath = System.getProperty("user.dir") + resume.getFilePath();
+        UrlResource resource = new UrlResource("file:" + fullPath);
+
+        String encodedUploadFileName = UriUtils.encode(resume.getFileName(), StandardCharsets.UTF_8);
+        String contentDisposition = "attachment; filename=\"" + encodedUploadFileName + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(resource);
     }
 
 
@@ -112,8 +140,13 @@ public class ResumeController {
     }
 
     @PostMapping("/create")
-    public String create(@Valid ResumeDto resumeDto, BindingResult bindingResult, Principal principal) throws IOException {
+    public String create(@Valid @ModelAttribute ResumeDto resumeDto, BindingResult bindingResult, Principal principal) throws IOException {
         log.info("==============> {}", resumeDto);
+        if (resumeDto.getResumeFile() != null) {
+            log.info("==============> File Name: {}, Size: {}", resumeDto.getResumeFile().getOriginalFilename(), resumeDto.getResumeFile().getSize());
+        } else {
+            log.info("==============> File is NULL");
+        }
 
         if(bindingResult.hasErrors()){
             return "resume/inputForm";
