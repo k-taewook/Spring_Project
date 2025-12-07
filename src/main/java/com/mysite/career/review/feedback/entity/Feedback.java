@@ -21,9 +21,6 @@ public class Feedback extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content; // 피드백/첨삭 내용
 
-    @Column
-    private Integer rating; // 자소서 점수 (1~5)
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resume_id", nullable = false)
     private Resume resume;

@@ -15,6 +15,4 @@ public class FeedbackDto {
 
     @NotEmpty(message = "내용은 필수 항목 입니다.")
     private String content;
-
-    private Integer rating;
 }

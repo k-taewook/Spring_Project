@@ -19,7 +19,6 @@ public class FeedbackService {
     public void create(Resume resume, FeedbackDto feedbackDto, User user) {
         Feedback feedback = Feedback.builder()
                 .content(feedbackDto.getContent())
-                .rating(feedbackDto.getRating())
                 .resume(resume)
                 .author(user)
                 .build();
@@ -34,7 +33,6 @@ public class FeedbackService {
 
     public void modify(Feedback feedback, @Valid FeedbackDto feedbackDto) {
         feedback.setContent(feedbackDto.getContent());
-        feedback.setRating(feedbackDto.getRating());
         feedbackRepository.save(feedback);
     }
 

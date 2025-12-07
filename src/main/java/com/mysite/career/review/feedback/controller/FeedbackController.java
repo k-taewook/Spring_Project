@@ -77,7 +77,6 @@ public class FeedbackController {
         }
 
         feedbackDto.setContent(feedback.getContent());
-        feedbackDto.setRating(feedback.getRating());
 
         return "feedback/inputForm";
     }
