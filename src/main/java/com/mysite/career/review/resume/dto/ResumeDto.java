@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data                                   // getter, setter, ToString 등등 모든 기능 있음
 @NoArgsConstructor
@@ -24,4 +25,6 @@ public class ResumeDto {
     private String targetCompany;
 
     private ResumeStatus status;
+
+    private MultipartFile resumeFile;
 }

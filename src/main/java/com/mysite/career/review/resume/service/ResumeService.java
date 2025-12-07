@@ -13,9 +13,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +43,32 @@ public class ResumeService {
         return resume;
     }
 
-    public void create(ResumeDto resumeDto, User user) {
+    public void create(ResumeDto resumeDto, User user) throws IOException {
+        String projectPath = System.getProperty("user.dir") + "\\files\\";
+        UUID uuid = UUID.randomUUID();
+        String fileName = "";
+        String filePath = "";
+
+        if (resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty()) {
+            fileName = uuid + "_" + resumeDto.getResumeFile().getOriginalFilename();
+            File saveFile = new File(projectPath, fileName);
+            
+            if (!saveFile.getParentFile().exists()) {
+                saveFile.getParentFile().mkdirs();
+            }
+            
+            resumeDto.getResumeFile().transferTo(saveFile);
+            filePath = "/files/" + fileName;
+        }
+
         Resume resume = Resume.builder()
                 .content(resumeDto.getContent())
                 .subject(resumeDto.getSubject())
                 .targetCompany(resumeDto.getTargetCompany())
                 .status(ResumeStatus.WAITING)
                 .author(user)
+                .fileName(resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty() ? resumeDto.getResumeFile().getOriginalFilename() : null)
+                .filePath(filePath.isEmpty() ? null : filePath)
                 .build();
         resumeRepository.save(resume);              // insert
     }

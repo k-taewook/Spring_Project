@@ -32,6 +32,12 @@ public class Resume extends BaseEntity {
     @Column(length = 100)
     private String targetCompany; // 지원 목표 기업
 
+    @Column(length = 300)
+    private String filePath; // 파일 경로
+
+    @Column(length = 300)
+    private String fileName; // 원본 파일명
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private ResumeStatus status; // 진행 상태

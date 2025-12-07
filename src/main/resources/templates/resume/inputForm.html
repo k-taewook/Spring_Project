@@ -13,7 +13,7 @@
 <body>
     <div class="container my-3">
         <h1>이력서 등록</h1>
-        <form method="post" th:object="${resumeDto}">
+        <form method="post" th:object="${resumeDto}" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="subject" class="form-label">지원 분야/제목</label>
                 <input type="text" class="form-control" id="subject" name="subject" th:field="*{subject}" placeholder="지원 분야 또는 제목을 입력하세요">
@@ -22,6 +22,10 @@
             <div class="mb-3">
                 <label for="targetCompany" class="form-label">지원 목표 기업</label>
                 <input type="text" class="form-control" id="targetCompany" name="targetCompany" th:field="*{targetCompany}" placeholder="지원 목표 기업을 입력하세요 (예: 삼성전자, 네이버)">
+            </div>
+            <div class="mb-3">
+                <label for="resumeFile" class="form-label">이력서 파일 첨부</label>
+                <input type="file" class="form-control" id="resumeFile" name="resumeFile">
             </div>
             <div class="mb-3" th:if="${resumeDto.status != null}">
                 <label for="status" class="form-label">진행 상태</label>

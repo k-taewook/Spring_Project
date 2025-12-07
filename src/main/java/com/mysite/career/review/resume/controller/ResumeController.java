@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -111,7 +112,7 @@ public class ResumeController {
     }
 
     @PostMapping("/create")
-    public String create(@Valid ResumeDto resumeDto, BindingResult bindingResult, Principal principal){
+    public String create(@Valid ResumeDto resumeDto, BindingResult bindingResult, Principal principal) throws IOException {
         log.info("==============> {}", resumeDto);
 
         if(bindingResult.hasErrors()){
