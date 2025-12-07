@@ -69,6 +69,7 @@ public class ResumeService {
                     .originalFileName(resumeDto.getResumeFile().getOriginalFilename())
                     .contentType(resumeDto.getResumeFile().getContentType())
                     .fileData(resumeDto.getResumeFile().getBytes())
+                    .fileSize(resumeDto.getResumeFile().getSize())
                     .build();
         }
 
@@ -91,6 +92,7 @@ public class ResumeService {
                     .originalFileName(resumeDto.getResumeFile().getOriginalFilename())
                     .contentType(resumeDto.getResumeFile().getContentType())
                     .fileData(resumeDto.getResumeFile().getBytes())
+                    .fileSize(resumeDto.getResumeFile().getSize())
                     .build();
             
             resume.setFile(file);

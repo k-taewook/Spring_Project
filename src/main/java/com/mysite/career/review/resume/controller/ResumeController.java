@@ -119,6 +119,26 @@ public class ResumeController {
                 .body(resource);
     }
 
+    @GetMapping("/view/{id}")
+    public ResponseEntity<Resource> view(@PathVariable("id") Long id) {
+        Resume resume = resumeService.getResume(id);
+
+        if (resume.getFile() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        File file = resume.getFile();
+        ByteArrayResource resource = new ByteArrayResource(file.getFileData());
+
+        String encodedUploadFileName = UriUtils.encode(file.getOriginalFileName(), StandardCharsets.UTF_8);
+        String contentDisposition = "inline; filename=\"" + encodedUploadFileName + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
+                .body(resource);
+    }
+
 
     @GetMapping("/list")
     public String list(Model model,

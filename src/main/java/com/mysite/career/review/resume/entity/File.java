@@ -24,4 +24,6 @@ public class File {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] fileData;
 
+    private Long fileSize;
+
 }
