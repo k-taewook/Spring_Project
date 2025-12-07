@@ -3,6 +3,7 @@ package com.mysite.career.review.resume.service;
 import com.mysite.career.review.user.entity.User;
 import com.mysite.career.review.resume.constant.ResumeStatus;
 import com.mysite.career.review.resume.dto.ResumeDto;
+import com.mysite.career.review.resume.entity.File;
 import com.mysite.career.review.resume.entity.Resume;
 import com.mysite.career.review.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,17 +16,32 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
 public class ResumeService {
 
     private final ResumeRepository resumeRepository;
+
+    private void validateFileExtension(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && !fileName.isEmpty()) {
+            String extension = "";
+            int dotIndex = fileName.lastIndexOf(".");
+            if (dotIndex >= 0) {
+                extension = fileName.substring(dotIndex + 1).toLowerCase();
+            }
+            
+            List<String> allowedExtensions = Arrays.asList("zip", "pdf", "docx", "hwp");
+            if (!allowedExtensions.contains(extension)) {
+                throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. (.zip, .pdf, .docx, .hwp 만 가능)");
+            }
+        }
+    }
 
     public Page<Resume> getList(int page, String keyword) {
 
@@ -44,21 +60,16 @@ public class ResumeService {
     }
 
     public void create(ResumeDto resumeDto, User user) throws IOException {
-        String projectPath = System.getProperty("user.dir") + "\\files\\";
-        UUID uuid = UUID.randomUUID();
-        String fileName = "";
-        String filePath = "";
+        File file = null;
 
         if (resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty()) {
-            fileName = uuid + "_" + resumeDto.getResumeFile().getOriginalFilename();
-            File saveFile = new File(projectPath, fileName);
+            validateFileExtension(resumeDto.getResumeFile());
             
-            if (!saveFile.getParentFile().exists()) {
-                saveFile.getParentFile().mkdirs();
-            }
-            
-            resumeDto.getResumeFile().transferTo(saveFile);
-            filePath = "/files/" + fileName;
+            file = File.builder()
+                    .originalFileName(resumeDto.getResumeFile().getOriginalFilename())
+                    .contentType(resumeDto.getResumeFile().getContentType())
+                    .fileData(resumeDto.getResumeFile().getBytes())
+                    .build();
         }
 
         Resume resume = Resume.builder()
@@ -67,34 +78,22 @@ public class ResumeService {
                 .targetCompany(resumeDto.getTargetCompany())
                 .status(ResumeStatus.WAITING)
                 .author(user)
-                .fileName(resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty() ? resumeDto.getResumeFile().getOriginalFilename() : null)
-                .filePath(filePath.isEmpty() ? null : filePath)
+                .file(file)
                 .build();
         resumeRepository.save(resume);              // insert
     }
 
     public void modify(Resume resume, @Valid ResumeDto resumeDto) throws IOException {
-        String projectPath = System.getProperty("user.dir") + "\\files\\";
-        UUID uuid = UUID.randomUUID();
-        String fileName = "";
-        String filePath = "";
-
         if (resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty()) {
-            // 기존 파일 삭제 (선택 사항, 여기서는 덮어쓰기 개념으로 새 파일만 저장)
-            // if (resume.getFilePath() != null) { ... }
+            validateFileExtension(resumeDto.getResumeFile());
 
-            fileName = uuid + "_" + resumeDto.getResumeFile().getOriginalFilename();
-            File saveFile = new File(projectPath, fileName);
-
-            if (!saveFile.getParentFile().exists()) {
-                saveFile.getParentFile().mkdirs();
-            }
-
-            resumeDto.getResumeFile().transferTo(saveFile);
-            filePath = "/files/" + fileName;
-
-            resume.setFileName(resumeDto.getResumeFile().getOriginalFilename());
-            resume.setFilePath(filePath);
+            File file = File.builder()
+                    .originalFileName(resumeDto.getResumeFile().getOriginalFilename())
+                    .contentType(resumeDto.getResumeFile().getContentType())
+                    .fileData(resumeDto.getResumeFile().getBytes())
+                    .build();
+            
+            resume.setFile(file);
         }
 
         resume.setSubject(resumeDto.getSubject());

@@ -21,12 +21,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.io.IOException;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriUtils;
 import java.nio.charset.StandardCharsets;
 import java.net.MalformedURLException;
+import com.mysite.career.review.resume.entity.File;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,8 +59,9 @@ public class ResumeController {
 
         if(bindingResult.hasErrors()) {
             Resume resume = resumeService.getResume(id);
-            resumeDto.setOriginalFileName(resume.getFileName());
-            resumeDto.setOriginalFilePath(resume.getFilePath());
+            if (resume.getFile() != null) {
+                resumeDto.setOriginalFileName(resume.getFile().getOriginalFileName());
+            }
             resumeDto.setId(resume.getId());
             return "resume/inputForm";
         }
@@ -89,24 +91,31 @@ public class ResumeController {
         resumeDto.setContent(resume.getContent());
         resumeDto.setTargetCompany(resume.getTargetCompany());
         resumeDto.setStatus(resume.getStatus());
-        resumeDto.setOriginalFileName(resume.getFileName());
-        resumeDto.setOriginalFilePath(resume.getFilePath());
+        if (resume.getFile() != null) {
+            resumeDto.setOriginalFileName(resume.getFile().getOriginalFileName());
+        }
         resumeDto.setId(resume.getId());
 
         return "resume/inputForm";
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> download(@PathVariable("id") Long id) throws MalformedURLException {
+    public ResponseEntity<Resource> download(@PathVariable("id") Long id) {
         Resume resume = resumeService.getResume(id);
-        String fullPath = System.getProperty("user.dir") + resume.getFilePath();
-        UrlResource resource = new UrlResource("file:" + fullPath);
+        
+        if (resume.getFile() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        File file = resume.getFile();
+        ByteArrayResource resource = new ByteArrayResource(file.getFileData());
 
-        String encodedUploadFileName = UriUtils.encode(resume.getFileName(), StandardCharsets.UTF_8);
+        String encodedUploadFileName = UriUtils.encode(file.getOriginalFileName(), StandardCharsets.UTF_8);
         String contentDisposition = "attachment; filename=\"" + encodedUploadFileName + "\"";
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .header(HttpHeaders.CONTENT_TYPE, file.getContentType())
                 .body(resource);
     }
 
