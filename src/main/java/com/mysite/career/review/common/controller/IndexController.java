@@ -11,9 +11,4 @@ public class IndexController {
     public String index() {
         return "index";
     }
-
-    @GetMapping("/temp/abc")
-    public String abc(){
-        return "test/abc";
-    }
 }

@@ -23,16 +23,17 @@
                     <th>번호</th>
                     <th>상태</th>
                     <th>목표 기업</th>
-                    <th style="width:50%">지원 분야/제목</th>
+                    <th style="width:50%">지원분야</th>
                     <th>작성자</th>
-                    <th>작성일</th>
+                    <th>등록일</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="resume, loop : ${paging}">
                     <td class="text-center" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
                     <td class="text-center">
-                        <span class="badge bg-secondary" th:if="${resume.status != null}" th:text="${resume.status.description}"></span>
+                        <span class="badge bg-secondary" th:if="${resume.status.name() == 'WAITING'}" th:text="${resume.status.description}"></span>
+                        <span class="badge bg-success" th:if="${resume.status.name() == 'COMPLETED'}" th:text="${resume.status.description}"></span>
                     </td>
                     <td class="text-center" th:text="${resume.targetCompany}"></td>
                     <td>
