@@ -33,11 +33,11 @@ public class FeedbackController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String modify(@PathVariable("id") Long id, Principal principal) {
+    public String delete(@PathVariable("id") Long id, Principal principal) {
 
         Feedback feedback = feedbackService.getFeedback(id);
 
-        if(!feedback.getAuthor().getUsername().equals(principal.getName())) {
+        if(!feedback.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
@@ -58,7 +58,7 @@ public class FeedbackController {
 
         Feedback feedback = feedbackService.getFeedback(id);
 
-        if(!feedback.getAuthor().getUsername().equals(principal.getName())) {
+        if(!feedback.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
@@ -72,7 +72,7 @@ public class FeedbackController {
     public String modify(@PathVariable("id") Long id, @ModelAttribute FeedbackDto feedbackDto, Principal principal) {
         Feedback feedback = feedbackService.getFeedback(id);
 
-        if(!feedback.getAuthor().getUsername().equals(principal.getName())) {
+        if(!feedback.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 

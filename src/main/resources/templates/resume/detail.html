@@ -40,7 +40,7 @@
                     <a th:href="@{|/resume/modify/${resume.id}|}"
                        class="btn btn-sm btn-outline-primary"
                        sec:authorize="isAuthenticated()"
-                       th:if="${resume.author != null and #authentication.getPrincipal().getUsername() == resume.author.username}"
+                       th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
                     >
                         수정
                     </a>
@@ -48,7 +48,7 @@
                        th:data-uri="@{|/resume/delete/${resume.id}|}"
                        class="delete btn btn-sm btn-outline-danger"
                        sec:authorize="isAuthenticated()"
-                       th:if="${resume.author != null and #authentication.getPrincipal().getUsername() == resume.author.username}"
+                       th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
                     >
                         삭제
                     </a>
@@ -77,7 +77,7 @@
                     <a th:href="@{|/feedback/modify/${feedback.id}|}"
                        class="btn btn-sm btn-outline-primary"
                        sec:authorize="isAuthenticated()"
-                       th:if="${feedback.author != null and #authentication.getPrincipal().getUsername() == feedback.author.username}"
+                       th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
                     >
                         수정
                     </a>
@@ -85,7 +85,7 @@
                        th:data-uri="@{|/feedback/delete/${feedback.id}|}"
                        class="delete btn btn-sm btn-outline-danger"
                        sec:authorize="isAuthenticated()"
-                       th:if="${feedback.author != null and #authentication.getPrincipal().getUsername() == feedback.author.username}"
+                       th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
                     >
                         삭제
                     </a>

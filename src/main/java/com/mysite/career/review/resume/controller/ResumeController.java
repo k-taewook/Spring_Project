@@ -32,10 +32,10 @@ public class ResumeController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String modify(@PathVariable("id") Long id, Principal principal) {
+    public String delete(@PathVariable("id") Long id, Principal principal) {
         Resume resume = resumeService.getResume(id);
 
-        if(!resume.getAuthor().getUsername().equals(principal.getName())) {
+        if(!resume.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
@@ -55,7 +55,7 @@ public class ResumeController {
 
         Resume resume = resumeService.getResume(id);
 
-        if(!resume.getAuthor().getUsername().equals(principal.getName())) {
+        if(!resume.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
@@ -70,7 +70,7 @@ public class ResumeController {
     public String modify(@PathVariable("id") Long id, ResumeDto resumeDto, Principal principal) {
         Resume resume = resumeService.getResume(id);
 
-        if(!resume.getAuthor().getUsername().equals(principal.getName())) {
+        if(!resume.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
