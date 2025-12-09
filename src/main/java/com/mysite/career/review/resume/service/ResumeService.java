@@ -3,6 +3,8 @@ package com.mysite.career.review.resume.service;
 import com.mysite.career.review.user.entity.User;
 import com.mysite.career.review.resume.constant.ResumeStatus;
 import com.mysite.career.review.resume.dto.ResumeDto;
+import com.mysite.career.review.resume.entity.Application;
+import com.mysite.career.review.resume.repository.ApplicationRepository;
 import com.mysite.career.review.resume.entity.File;
 import com.mysite.career.review.resume.entity.Resume;
 import com.mysite.career.review.resume.repository.ResumeRepository;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 public class ResumeService {
 
     private final ResumeRepository resumeRepository;
+    private final ApplicationRepository applicationRepository;
 
     private void validateFileExtension(MultipartFile file) {
         String fileName = file.getOriginalFilename();
@@ -73,6 +76,15 @@ public class ResumeService {
                     .build();
         }
 
+        // 1. Application 생성
+        Application application = Application.builder()
+                .targetCompany(resumeDto.getTargetCompany())
+                .status(ResumeStatus.WAITING)
+                .author(user)
+                .build();
+        applicationRepository.save(application);
+
+        // 2. Resume (v1) 생성
         Resume resume = Resume.builder()
                 .content(resumeDto.getContent())
                 .subject(resumeDto.getSubject())
@@ -80,29 +92,62 @@ public class ResumeService {
                 .status(ResumeStatus.WAITING)
                 .author(user)
                 .file(file)
+                .application(application)
+                .version(1)
+                .commitMessage("Initial Commit")
                 .build();
         resumeRepository.save(resume);              // insert
     }
 
-    public void modify(Resume resume, @Valid ResumeDto resumeDto) throws IOException {
+    public Resume modify(Resume oldResume, @Valid ResumeDto resumeDto) throws IOException {
+        File file = null;
+
+        // 파일 처리: 새 파일이 있으면 사용, 없으면 기존 파일 복사(참조)
         if (resumeDto.getResumeFile() != null && !resumeDto.getResumeFile().isEmpty()) {
             validateFileExtension(resumeDto.getResumeFile());
 
-            File file = File.builder()
+            file = File.builder()
                     .originalFileName(resumeDto.getResumeFile().getOriginalFilename())
                     .contentType(resumeDto.getResumeFile().getContentType())
                     .fileData(resumeDto.getResumeFile().getBytes())
                     .fileSize(resumeDto.getResumeFile().getSize())
                     .build();
-            
-            resume.setFile(file);
+        } else if (oldResume.getFile() != null) {
+            // 기존 파일 정보를 그대로 사용하여 새 File 엔티티 생성
+            File oldFile = oldResume.getFile();
+            file = File.builder()
+                    .originalFileName(oldFile.getOriginalFileName())
+                    .contentType(oldFile.getContentType())
+                    .fileData(oldFile.getFileData())
+                    .fileSize(oldFile.getFileSize())
+                    .build();
         }
 
-        resume.setSubject(resumeDto.getSubject());
-        resume.setContent(resumeDto.getContent());
-        resume.setTargetCompany(resumeDto.getTargetCompany());
-        resume.setStatus(resumeDto.getStatus());
-        resumeRepository.save(resume);              // update
+        // 새 버전 생성 (기존 Resume 수정 아님)
+        Application application = oldResume.getApplication();
+        
+        int maxVersion = 0;
+        if (application != null && application.getResumes() != null) {
+            maxVersion = application.getResumes().stream()
+                    .mapToInt(r -> r.getVersion() == null ? 0 : r.getVersion())
+                    .max()
+                    .orElse(0);
+        }
+        int nextVersion = maxVersion + 1;
+
+        Resume newResume = Resume.builder()
+                .subject(resumeDto.getSubject())
+                .content(resumeDto.getContent())
+                .targetCompany(resumeDto.getTargetCompany())
+                .status(resumeDto.getStatus())
+                .author(oldResume.getAuthor())
+                .file(file)
+                .application(application)
+                .version(nextVersion)
+                .commitMessage(resumeDto.getCommitMessage())
+                .build();
+
+        return resumeRepository.save(newResume);
     }
 
     public void delete(Resume resume) {

@@ -1,46 +1,49 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 
-<th:block layout:fragment="css">
-    <style>
-        .error {
-            color: #bd2130;
-        }
-    </style>
-</th:block>
+<div layout:fragment="content" class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary"><i class="bi bi-briefcase-fill me-2"></i>CareerBuilder</h2>
+                <p class="text-muted">커리어 성장을 위한 첫걸음</p>
+            </div>
+            
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
+                    <h4 class="card-title text-center mb-4 fw-bold">로그인</h4>
+                    
+                    <form th:action="@{/user/login}" method="post">
+                        <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>아이디 또는 비밀번호를 확인해주세요.</div>
+                        </div>
 
-<th:block layout:fragment="css">
-    <style>
-        .error {
-            color: #bd2130;
-        }
-    </style>
-</th:block>
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" id="username" class="form-control" placeholder="아이디">
+                            <label for="username">아이디</label>
+                        </div>
+                        
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="비밀번호">
+                            <label for="password">비밀번호</label>
+                        </div>
 
-<div layout:fragment="content" class="container my-3">
-    <div class="my-3 border-bottom">
-        <div>
-            <h4>로그인</h4>
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">로그인</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <span class="text-muted">계정이 없으신가요?</span>
+                            <a href="/user/signup" class="text-decoration-none fw-bold ms-1">회원가입</a>
+                        </div>
+                        
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    <form th:action="@{/user/login}"  method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">사용자ID</label>
-            <input type="text" name="username" id="username" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input type="password" name="password" id="password" class="form-control">
-        </div>
-        <div class="mb-3">
-            <p th:if="${loginError}" class="error" th:text="${loginError}"></p>
-            <button class="btn btn-primary">로그인</button>
-            <button type="button" class="btn btn-primary" onClick="location.href='/user/signup'">회원가입</button>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        </div>
-    </form>
 </div>
-
 </html>

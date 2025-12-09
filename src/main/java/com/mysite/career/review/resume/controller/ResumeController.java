@@ -28,6 +28,8 @@ import org.springframework.web.util.UriUtils;
 import java.nio.charset.StandardCharsets;
 import java.net.MalformedURLException;
 import com.mysite.career.review.resume.entity.File;
+import java.util.List;
+import java.util.ArrayList;
 
 @Controller
 @RequiredArgsConstructor
@@ -72,9 +74,10 @@ public class ResumeController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
-        resumeService.modify(resume, resumeDto);
+        Resume newResume = resumeService.modify(resume, resumeDto);
 
-        return "redirect:/resume/detail/" + id;
+        // 수정 후에는 새로운 버전의 상세 페이지로 이동
+        return "redirect:/resume/detail/" + newResume.getId();
 
     }
 
@@ -156,7 +159,15 @@ public class ResumeController {
     public String detail(@PathVariable("id") Long id, Model model, FeedbackDto feedbackDto){
         log.info("==============> id : {}", id);
         Resume resume = resumeService.getResume(id);
+        
+        // 이력서 버전 히스토리 조회
+        List<Resume> history = new ArrayList<>();
+        if (resume.getApplication() != null) {
+            history = resume.getApplication().getResumes();
+        }
+
         model.addAttribute("resume", resume);
+        model.addAttribute("history", history);
         model.addAttribute("feedbackDto", feedbackDto);
         log.info("==============> resume : {}", resume);
         return "resume/detail";

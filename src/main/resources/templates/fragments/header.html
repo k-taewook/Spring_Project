@@ -2,34 +2,38 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <div th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">CareerBuilder</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary fs-4" href="/">
+                <i class="bi bi-briefcase-fill me-2"></i>CareerBuilder
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        <a class="nav-link px-3 fw-medium" aria-current="page" href="/">홈</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/resume/list">이력서 목록</a>
+                        <a class="nav-link px-3 fw-medium" href="/resume/list">이력서 목록</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link" href="/user/signup">회원 가입</a>
+                        <a class="nav-link px-3 fw-medium" href="/user/login">로그인</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAnonymous()">
-                        <a class="nav-link" href="/user/login">로그인</a>
+                        <a class="btn btn-primary ms-2 rounded-pill px-4 fw-bold" href="/user/signup">회원가입</a>
                     </li>
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" href="/user/logout">로그아웃</a>
+                        <span class="nav-link px-3 text-secondary">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span sec:authentication="name">User</span>님
+                        </span>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="btn btn-outline-secondary ms-2 rounded-pill px-3 btn-sm" href="/user/logout">로그아웃</a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
             </div>
         </div>
     </nav>

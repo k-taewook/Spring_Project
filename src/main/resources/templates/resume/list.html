@@ -1,129 +1,139 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 
-    <div layout:fragment="content" class="container my-3">
-        <div class="container my-3">
-            <h2>이력서 리스트</h2>
-            <div class="row my-3">
-                <div class="col-6">
-                    <a th:href="@{/resume/create}" class="btn btn-primary">이력서 등록</a>
-                </div>
-                <div class="col-6">
-                    <div class="input-group">
-                        <input th:type="text" id="search_keyword" class="form-control" th:value="${keyword}">
-                        <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
-                    </div>
-                </div>
-            </div>
-            <table class="table table-striped">
-                <thead class="table-dark">
-                <tr class="text-center">
-                    <th>번호</th>
-                    <th>상태</th>
-                    <th>목표 기업</th>
-                    <th style="width:50%">지원분야</th>
-                    <th>작성자</th>
-                    <th>등록일</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="resume, loop : ${paging}">
-                    <td class="text-center" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
-                    <td class="text-center">
-                        <span class="badge bg-secondary" th:if="${resume.status.name() == 'WAITING'}" th:text="${resume.status.description}"></span>
-                        <span class="badge bg-success" th:if="${resume.status.name() == 'COMPLETED'}" th:text="${resume.status.description}"></span>
-                    </td>
-                    <td class="text-center" th:text="${resume.targetCompany}"></td>
-                    <td>
-                        <a th:href="@{|/resume/detail/${resume.id}|}" th:text="${resume.subject}"></a>
-                        <span class="badge bg-primary" th:if="${#lists.size(resume.feedbackList) > 0}"
-                              th:text="${#lists.size(resume.feedbackList)}">
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <span th:text="${resume.author.username}"></span>
-                    </td>
-                    <td class="text-center" th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm:ss')}">날짜1</td>
-                </tr>
-                </tbody>
-            </table>
-
-            <!-- 페이징 기능 추가 -->
-            <!-- 코드는 먼저 paging 객체가 비어 있지 않은지 확인합니다. 이를 통해 페이징 데이터가 없는 경우 페이징 UI를 렌더링하지 않도록 합니다. -->
-            <div th:if="${!paging.isEmpty()}">
-
-                <!-- startPage와 endPage는 현재 페이지 번호(paging.number)를 기준으로 계산됩니다. startPage는 현재 페이지 번호를 10으로 나눈 뒤 10을 곱해 계산되며,
-                endPage는 총 페이지 수(paging.totalPages)와 비교하여 적절한 값을 설정합니다.-->
-                <th:block th:with="startPage=${(paging.number/10) * 10}, endPage=(${(paging.totalPages == 0) ? 1 : (startPage + 9 < paging.totalPages ? startPage + 9 : paging.totalPages - 1)})">
-
-                    <ul class="pagination justify-content-center">
-                        <!-- 처음 버튼: 첫 번째 페이지로 이동하는 버튼입니다. 현재 페이지가 첫 페이지(paging.number == 0)인 경우 disabled 클래스를 추가하여 비활성화합니다.-->
-                        <li class="page-item" th:classappend="${paging.number == 0} ? 'disabled'">
-                            <a class="page-link" href="javascript:void(0)" th:data-page="0">
-                                <span>처음</span>
-                            </a>
-                        </li>
-                        <!-- 이전 버튼: 이전 페이지로 이동하는 버튼입니다. 이전 페이지가 없는 경우(!paging.hasPrevious), disabled 클래스를 추가합니다. -->
-                        <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
-                            <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number-1}">
-                                <span>이전</span>
-                            </a>
-                        </li>
-                        <!-- 페이지 번호 버튼: startPage부터 endPage까지의 페이지 번호를 반복 렌더링합니다. 현재 페이지는 active 클래스를 추가하여 강조합니다. -->
-                        <li th:each="page: ${#numbers.sequence(startPage, endPage)}"
-                            th:classappend="${page == paging.number} ? 'active'" class="page-item">
-                            <a th:text="${page + 1}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
-                        </li>
-                        <!-- 다음 버튼: 다음 페이지로 이동하는 버튼입니다. 다음 페이지가 없는 경우(!paging.hasNext), disabled 클래스를 추가합니다 -->
-                        <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
-                            <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
-                                <span>다음</span>
-                            </a>
-                        </li>
-                        <!-- 마지막 버튼: 마지막 페이지로 이동하는 버튼입니다. 현재 페이지가 마지막 페이지인 경우(paging.number == paging.totalPages-1), disabled 클래스를 추가합니다. -->
-                        <li class="page-item" th:classappend="${paging.number == paging.totalPages-1} ? 'disabled'">
-                            <a class="page-link" href="javascript:void(0)" th:data-page="${paging.totalPages-1}">
-                                <span>마지막</span>
-                            </a>
-                        </li>
-                    </ul>
-
-                </th:block>
-            </div>
-
-            <form th:action="@{/resume/list}" method="get" id="searchForm">
-                <input type="hidden" id="page" name="page" th:value="${paging.number}">
-                <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
-            </form>
-
-
+<div layout:fragment="content" class="container my-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-list-ul me-2 text-primary"></i>이력서 목록
+            </h2>
+            <p class="text-muted mt-1 mb-0">등록된 이력서를 확인하고 관리하세요.</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a th:href="@{/resume/create}" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i>새 이력서 작성
+            </a>
         </div>
     </div>
 
-<script layout:fragment="script" type="text/javascript">
-    const page_elements = document.getElementsByClassName("page-link");
-    Array.from(page_elements).forEach(function(element) {
-        element.addEventListener("click", function(event) {
-            document.getElementById("page").value = this.dataset.page;
-            document.getElementById("searchForm").submit();
-        })
-    })
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <!-- 검색 창 -->
+            <div class="row mb-4 justify-content-end">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="search_keyword" class="form-control border-start-0 ps-0" th:value="${keyword}" placeholder="제목, 기업명 검색">
+                        <button class="btn btn-dark" type="button" id="btn_search">검색</button>
+                    </div>
+                </div>
+            </div>
 
-    // 찾기 버튼 클릭
-    $("#btn_search").on("click", function () {
-        $("#keyword").val($("#search_keyword").val());
-        $("#page").val(0); // 검색버튼 클릭 시 0페이지부터 조회
-        $("#searchForm").submit();
-    });
+            <!-- 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th style="width: 5%">번호</th>
+                            <th style="width: 10%">상태</th>
+                            <th style="width: 15%">목표 기업</th>
+                            <th style="width: 40%">제목</th>
+                            <th style="width: 10%">작성자</th>
+                            <th style="width: 15%">등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="resume, loop : ${paging}">
+                            <td class="text-center text-muted" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary" 
+                                      th:if="${resume.status.name() == 'WAITING'}" th:text="${resume.status.description}"></span>
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success" 
+                                      th:if="${resume.status.name() == 'COMPLETED'}" th:text="${resume.status.description}"></span>
+                            </td>
+                            <td class="text-center fw-medium text-dark" th:text="${resume.targetCompany}"></td>
+                            <td>
+                                <a th:href="@{|/resume/detail/${resume.id}|}" class="text-decoration-none text-dark fw-bold d-block text-truncate" style="max-width: 400px;">
+                                    <span th:text="${resume.subject}"></span>
+                                    <span class="badge bg-danger rounded-pill ms-1" th:if="${#lists.size(resume.feedbackList) > 0}"
+                                          th:text="${#lists.size(resume.feedbackList)}">
+                                    </span>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="avatar-circle bg-light text-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span th:text="${resume.author.username}"></span>
+                                </div>
+                            </td>
+                            <td class="text-center text-muted small" th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                        <tr th:if="${paging.isEmpty()}">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                                등록된 이력서가 없습니다.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    // 엔터키 눌렀을 때 찾기 버튼 클릭
-    $("#search_keyword").on("keydown", function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault(); // 폼 자동 제출 방지
-            $("#btn_search").click(); // 찾기 버튼 클릭과 동일 동작
-        }
-    });
-</script>
+            <!-- 페이징 -->
+            <div th:if="${!paging.isEmpty()}" class="mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center pagination-sm">
+                        <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                            <a class="page-link rounded-circle mx-1 border-0 bg-light text-dark" href="javascript:void(0)" th:data-page="${paging.number-1}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                            th:if="${page >= paging.number-2 and page <= paging.number+2}"
+                            th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                            <a th:text="${page + 1}" class="page-link rounded-circle mx-1 border-0" 
+                               th:classappend="${page == paging.number} ? 'bg-primary text-white shadow-sm' : 'bg-light text-dark'"
+                               href="javascript:void(0)" th:data-page="${page}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                            <a class="page-link rounded-circle mx-1 border-0 bg-light text-dark" href="javascript:void(0)" th:data-page="${paging.number+1}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <form th:action="@{/resume/list}" method="get" id="searchForm">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
+    </form>
+
+    <script layout:fragment="script" type='text/javascript'>
+        const page_elements = document.getElementsByClassName("page-link");
+        Array.from(page_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                document.getElementById('page').value = this.dataset.page;
+                document.getElementById('searchForm').submit();
+            });
+        });
+        const btn_search = document.getElementById("btn_search");
+        btn_search.addEventListener('click', function() {
+            document.getElementById('keyword').value = document.getElementById('search_keyword').value;
+            document.getElementById('page').value = 0;  // 검색 시 0페이지부터 조회
+            document.getElementById('searchForm').submit();
+        });
+        
+        // 엔터키 검색 지원
+        document.getElementById("search_keyword").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                document.getElementById("btn_search").click();
+            }
+        });
+    </script>
+</div>
 </html>

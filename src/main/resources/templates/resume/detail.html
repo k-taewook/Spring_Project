@@ -1,121 +1,177 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/layout}">
 
-    <th:block layout:fragment="css">
-        <style>
-            .fieldError {
-                color: #e20b1d
-            }
-        </style>
-    </th:block>
-
-    <div layout:fragment="content" class="container my-3">
-        <h2 th:text="${resume.subject}">상세 페이지</h2>
-        <div class="card my-3 bg-warning-subtle">
-            <div class="card-body">
-                <div class="mb-3">
-                    <span class="badge bg-info text-dark" th:if="${resume.targetCompany != null}" th:text="|목표 기업: ${resume.targetCompany}|"></span>
-                    <span class="badge bg-secondary" th:if="${resume.status != null}" th:text="|상태: ${resume.status.description}|"></span>
+<div layout:fragment="content" class="container my-5">
+    <div class="row">
+        <!-- 왼쪽: 이력서 본문 -->
+        <div class="col-lg-8">
+            <!-- 헤더 섹션 -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-primary me-2" th:if="${resume.status != null}" th:text="${resume.status.description}"></span>
+                    <span class="text-muted small" th:text="|v${resume.version}|">v1</span>
                 </div>
-                <div class="card-text" th:text="${resume.content}" style="white-space: pre-line;"></div>
+                <h2 class="fw-bold text-dark mb-3" th:text="${resume.subject}">이력서 제목</h2>
+                <div class="d-flex align-items-center text-muted">
+                    <div class="d-flex align-items-center me-3">
+                        <i class="bi bi-building me-1"></i>
+                        <span th:text="${resume.targetCompany != null ? resume.targetCompany : '목표 기업 미정'}"></span>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <i class="bi bi-person me-1"></i>
+                        <span th:text="${resume.author.username}"></span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock me-1"></i>
+                        <span th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 본문 카드 -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-primary mb-3"><i class="bi bi-file-text me-2"></i>자기소개서 본문</h5>
+                    <div class="card-text lh-lg" th:text="${resume.content}" style="white-space: pre-line; min-height: 200px;"></div>
+                </div>
+            </div>
+
+            <!-- 첨부 파일 카드 -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4" th:if="${resume.file != null}">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold text-primary mb-3"><i class="bi bi-paperclip me-2"></i>첨부 파일</h5>
+                    <div class="d-flex align-items-center p-3 bg-light rounded border">
+                        <i class="bi bi-file-earmark-text fs-3 text-secondary me-3"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" th:text="${resume.file.originalFileName}">filename.pdf</div>
+                            <div class="small text-muted" th:if="${resume.file.fileSize != null}" th:text="|${#numbers.formatInteger(resume.file.fileSize / 1024, 0, 'COMMA')} KB|"></div>
+                        </div>
+                        <div>
+                            <a th:href="@{|/resume/download/${resume.id}|}" class="btn btn-outline-dark btn-sm me-1">
+                                <i class="bi bi-download me-1"></i>다운로드
+                            </a>
+                            <a th:if="${#strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.pdf') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.jpg') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.png')}"
+                               th:href="@{|/resume/view/${resume.id}|}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye me-1"></i>미리보기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div class="d-flex justify-content-end mb-5">
+                <a th:href="@{|/resume/modify/${resume.id}|}"
+                   class="btn btn-primary me-2"
+                   sec:authorize="isAuthenticated()"
+                   th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
+                    <i class="bi bi-pencil-square me-1"></i>수정 (새 버전)
+                </a>
+                <a href="javascript:void(0)"
+                   th:data-uri="@{|/resume/delete/${resume.id}|}"
+                   class="delete btn btn-outline-danger"
+                   sec:authorize="isAuthenticated()"
+                   th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
+                    <i class="bi bi-trash me-1"></i>삭제
+                </a>
+            </div>
+
+            <!-- 피드백 섹션 -->
+            <div class="mb-5">
+                <h4 class="fw-bold mb-3">
+                    <i class="bi bi-chat-dots me-2 text-success"></i>피드백 
+                    <span class="badge bg-success rounded-pill fs-6 align-middle ms-1" th:text="${#lists.size(resume.feedbackList)}">0</span>
+                </h4>
                 
-                <div class="my-3" th:if="${resume.file != null}">
-                    <label class="form-label fw-bold">첨부 파일:</label>
-                    <a th:href="@{|/resume/download/${resume.id}|}" class="btn btn-sm btn-outline-dark">
-                        <span th:text="${resume.file.originalFileName}"></span>
-                        <span th:if="${resume.file.fileSize != null}" th:text="|(${#numbers.formatInteger(resume.file.fileSize / 1024, 0, 'COMMA')} KB)|"></span>
-                    </a>
-                    <a th:if="${#strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.pdf') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.jpg') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.png')}"
-                       th:href="@{|/resume/view/${resume.id}|}" target="_blank" class="btn btn-sm btn-outline-secondary ms-2">미리보기</a>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <div class="badge bg-danger text-white p-2 text-start mx-3">
-                        <div class="mb-2">
-                            <span th:text="${resume.author.username}"></span>
-                        </div>
-                        <div th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm')}"></div>
+                <!-- 피드백 작성 폼 -->
+                <div class="card shadow-sm border-0 rounded-3 mb-4 bg-light">
+                    <div class="card-body p-4">
+                        <form th:object="${feedbackDto}" th:action="@{|/feedback/create/${resume.id}|}" method="post">
+                            <div class="mb-3">
+                                <textarea sec:authorize="isAnonymous()" disabled class="form-control" rows="3" placeholder="로그인 후 피드백을 남길 수 있습니다."></textarea>
+                                <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="3" placeholder="이력서에 대한 피드백을 남겨주세요."></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-success px-4" sec:authorize="isAuthenticated()">등록</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <!-- 수정 / 삭제 -->
-                <div>
-                    <a th:href="@{|/resume/modify/${resume.id}|}"
-                       class="btn btn-sm btn-outline-primary"
-                       sec:authorize="isAuthenticated()"
-                       th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
-                    >
-                        수정
-                    </a>
-                    <a href="javascript:void(0)"
-                       th:data-uri="@{|/resume/delete/${resume.id}|}"
-                       class="delete btn btn-sm btn-outline-danger"
-                       sec:authorize="isAuthenticated()"
-                       th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
-                    >
-                        삭제
-                    </a>
+
+                <!-- 피드백 리스트 -->
+                <div class="card shadow-sm border-0 rounded-3 mb-3" th:each="feedback : ${resume.feedbackList}">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-success text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="fw-bold" th:text="${feedback.author.username}">User</span>
+                            </div>
+                            <small class="text-muted" th:text="${#temporals.format(feedback.created, 'yyyy-MM-dd HH:mm')}">2023-01-01</small>
+                        </div>
+                        <div class="card-text mb-3" th:text="${feedback.content}" style="white-space: pre-line;"></div>
+                        
+                        <div class="d-flex justify-content-end" 
+                             sec:authorize="isAuthenticated()"
+                             th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
+                            <a th:href="@{|/feedback/modify/${feedback.id}|}" class="btn btn-sm btn-outline-secondary me-1">수정</a>
+                            <a href="javascript:void(0)" th:data-uri="@{|/feedback/delete/${feedback.id}|}" class="delete btn btn-sm btn-outline-danger">삭제</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(resume.feedbackList)} 개의 첨삭 피드백이 있습니다.|"></h5>
-
-        <div class="card my-3 bg-success-subtle" th:each="feedback : ${resume.feedbackList}">
-            <div class="card-body">
-                <div class="card-text" th:text="${feedback.content}" style="white-space: pre-line;"></div>
-                <div class="d-flex justify-content-end">
-                    <div class="badge bg-success text-light p-2 text-start mx-3">
-                        <div class="mb-2">
-                            <span th:text="${feedback.author.username}"></span>
-                        </div>
-                        <div th:text="${#temporals.format(feedback.created, 'yyyy-MM-dd HH:mm')}"></div>
+        <!-- 오른쪽: 사이드바 (버전 히스토리 등) -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 2rem;">
+                <!-- 버전 히스토리 카드 -->
+                <div class="card shadow-sm border-0 rounded-3 mb-4" th:if="${not #lists.isEmpty(history)}">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>버전 히스토리</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a th:each="ver : ${history}" 
+                           th:href="@{|/resume/detail/${ver.id}|}"
+                           class="list-group-item list-group-item-action p-3"
+                           th:classappend="${ver.id == resume.id} ? 'active bg-primary border-primary' : ''">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <span class="badge rounded-pill" 
+                                      th:classappend="${ver.id == resume.id} ? 'bg-white text-primary' : 'bg-secondary'"
+                                      th:text="|v${ver.version}|">v1</span>
+                                <small th:classappend="${ver.id == resume.id} ? 'text-white-50' : 'text-muted'"
+                                       th:text="${#temporals.format(ver.created, 'yyyy-MM-dd HH:mm')}">3 days ago</small>
+                            </div>
+                            <p class="mb-1 fw-medium" th:text="${ver.commitMessage}">Initial Commit</p>
+                        </a>
                     </div>
                 </div>
-                <!-- 수정 / 삭제 -->
-                <div>
-                    <a th:href="@{|/feedback/modify/${feedback.id}|}"
-                       class="btn btn-sm btn-outline-primary"
-                       sec:authorize="isAuthenticated()"
-                       th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
-                    >
-                        수정
-                    </a>
-                    <a href="javascript:void(0)"
-                       th:data-uri="@{|/feedback/delete/${feedback.id}|}"
-                       class="delete btn btn-sm btn-outline-danger"
-                       sec:authorize="isAuthenticated()"
-                       th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}"
-                    >
-                        삭제
-                    </a>
+                
+                <!-- 안내 카드 -->
+                <div class="card bg-light border-0 rounded-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-muted mb-2"><i class="bi bi-info-circle me-2"></i>안내</h6>
+                        <p class="small text-muted mb-0">
+                            이력서를 수정하면 새로운 버전이 생성됩니다. 이전 버전은 히스토리에서 언제든지 확인할 수 있습니다.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!--    변수면 $, 아니면 @-->
-        <form th:object="${feedbackDto}" class="my-3" th:action="@{|/feedback/create/${resume.id}|}" method="post">
-            <div class="mb-3">
-                <label for="content" class="form-label">내용</label>
-                <textarea sec:authorize="isAnonymous()" disabled class="form-control" th:field="*{content}" rows="7"></textarea>
-                <textarea sec:authorize="isAuthenticated()" class="form-control" th:field="*{content}" rows="7"></textarea>
-                <p class="fieldError" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">error</p>
-            </div>
-            <input class="btn btn-primary my-3" type="submit" value="첨삭 등록">
-        </form>
     </div>
-    <th:block layout:fragment="script">
-        <script type="text/javascript">
-            $(() =>  {
-                $('.delete').click(function(){
-                    if(confirm("정말 삭제할까요?")) {
-                        const uri = $(this).data('uri');
-                        window.location.href = uri;
-                    }
-                });
-            })
-        </script>
-    </th:block>
+
+    <script layout:fragment="script" type='text/javascript'>
+        const delete_elements = document.getElementsByClassName("delete");
+        Array.from(delete_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                if(confirm("정말로 삭제하시겠습니까?")) {
+                    location.href = this.dataset.uri;
+                }
+            });
+        });
+    </script>
+</div>
 </html>

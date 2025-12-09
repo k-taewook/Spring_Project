@@ -1,99 +1,100 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 
-    <th:block layout:fragment="css">
-        <style>
-            .fieldError {
-                color: #e20b1d
-            }
-        </style>
-    </th:block>
+<div layout:fragment="content" class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-primary"><i class="bi bi-person-plus-fill me-2"></i>회원가입</h2>
+                <p class="text-muted">CareerBuilder와 함께 커리어를 시작하세요.</p>
+            </div>
 
-    <div layout:fragment="content" class="container my-3">
-        <div class="my-3 border-bottom">
-            <div><h4>회원가입</h4></div>
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
+                    <form th:action="@{/user/signup}" th:object="${userDto}" method="post" class="needs-validation" novalidate>
+                        
+                        <!-- 사용자ID -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">아이디</label>
+                            <input type="text" th:field="*{username}" id="username" class="form-control form-control-lg" placeholder="아이디를 입력하세요">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                        </div>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label for="password1" class="form-label fw-bold">비밀번호</label>
+                            <input type="password" th:field="*{password1}" id="password1" class="form-control form-control-lg" placeholder="비밀번호를 입력하세요">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}"></div>
+                        </div>
+
+                        <!-- 비밀번호 확인 -->
+                        <div class="mb-3">
+                            <label for="password2" class="form-label fw-bold">비밀번호 확인</label>
+                            <input type="password" th:field="*{password2}" id="password2" class="form-control form-control-lg" placeholder="비밀번호를 다시 입력하세요">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}"></div>
+                        </div>
+
+                        <!-- 이메일 -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-bold">이메일</label>
+                            <input type="email" th:field="*{email}" id="email" class="form-control form-control-lg" placeholder="example@email.com">
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        </div>
+
+                        <!-- 성별 (라디오) -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold d-block mb-2">성별</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" id="genderM" value="MALE">
+                                    <label class="form-check-label" for="genderM">남성</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" th:field="*{gender}" id="genderF" value="FEMALE">
+                                    <label class="form-check-label" for="genderF">여성</label>
+                                </div>
+                            </div>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                        </div>
+
+                        <!-- 학과 (Select) -->
+                        <div class="mb-4">
+                            <label for="department" class="form-label fw-bold">학과</label>
+                            <select class="form-select form-select-lg" id="department" th:field="*{department}">
+                                <option value="">학과를 선택하세요</option>
+                                <option value="CSE">컴퓨터시스템공학과</option>
+                                <option value="AI">인공지능학과</option>
+                                <option value="DATA">데이터사이언스학과</option>
+                                <option value="ELECTRONIC">전자학과</option>
+                                <option value="BUSINESS">경영학과</option>
+                            </select>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></div>
+                        </div>
+
+                        <!-- 이용약관 동의 -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{registration}" id="registration">
+                                <label class="form-check-label" for="registration">
+                                    서비스 이용약관에 동의합니다.
+                                </label>
+                            </div>
+                            <div class="text-danger small mt-1" th:if="${#fields.hasErrors('registration')}" th:errors="*{registration}"></div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">가입하기</button>
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <span class="text-muted">이미 계정이 있으신가요?</span>
+                            <a href="/user/login" class="text-decoration-none fw-bold ms-1">로그인</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <form th:action="@{/user/signup}" th:object="${userDto}" method="post">
-            <!-- 사용자ID -->
-            <div class="mb-3">
-                <label for="username" class="form-label">사용자ID</label>
-                <input type="text" th:field="*{username}" id="username" class="form-control">
-                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="fieldError"></p>
-            </div>
-
-            <!-- 비밀번호 -->
-            <div class="mb-3">
-                <label for="password1" class="form-label">비밀번호</label>
-                <input type="password" th:field="*{password1}" id="password1" class="form-control">
-                <p th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}" class="fieldError"></p>
-            </div>
-
-            <!-- 비밀번호 확인 -->
-            <div class="mb-3">
-                <label for="password2" class="form-label">비밀번호 확인</label>
-                <input type="password" th:field="*{password2}" id="password2" class="form-control">
-                <p th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}" class="fieldError"></p>
-            </div>
-
-            <!-- 이메일 -->
-            <div class="mb-3">
-                <label for="email" class="form-label">이메일</label>
-                <input type="email" th:field="*{email}" id="email" class="form-control">
-                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="fieldError"></p>
-            </div>
-
-            <!-- 성별 (라디오) -->
-            <div class="mb-3">
-                <label class="form-label d-block">성별</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" th:field="*{gender}" id="genderMale" value="MALE">
-                    <label class="form-check-label" for="genderMale">남성</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" th:field="*{gender}" id="genderFemale" value="FEMALE">
-                    <label class="form-check-label" for="genderFemale">여성</label>
-                </div>
-                <p th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="fieldError"></p>
-            </div>
-
-            <!-- 학과 (드롭다운) -->
-            <div class="mb-3">
-                <label for="department" class="form-label">학과</label>
-                <select th:field="*{department}" id="department" class="form-select">
-                    <option value="" disabled selected>학과를 선택하세요</option>
-                    <option value="CSE">컴퓨터시스템공학과</option>
-                    <option value="AI">인공지능학과</option>
-                    <option value="DATA">데이터사이언스학과</option>
-                    <option value="ELECTRICAL">전자공학과</option>
-                    <option value="MECHANICAL">기계공학과</option>
-                    <option value="BUSINESS">경영학과</option>
-                </select>
-                <p th:if="${#fields.hasErrors('department')}" th:errors="*{department}" class="fieldError"></p>
-            </div>
-
-            <!-- 등록 확인(체크박스) -->
-            <div class="mb-3 form-check">
-                <input class="form-check-input" type="checkbox" th:field="*{registration}" id="registration">
-                <label class="form-check-label" for="registration">
-                    (필수) 현재 학기 등록 여부 확인.
-                </label>
-                <p th:if="${#fields.hasErrors('registration')}" th:errors="*{registration}" class="fieldError"></p>
-            </div>
-
-            <button type="submit" class="btn btn-primary">회원가입</button>
-        </form>
     </div>
-    <th:block layout:fragment="script">
-        <script th:inline="javascript">
-            $(function() {
-                let errorMessage = [[${errorMessage}]];
-                if(errorMessage != null) {
-                    alert(errorMessage);
-                }
-            });
-        </script>
-    </th:block>
+</div>
 </html>

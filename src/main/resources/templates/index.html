@@ -1,14 +1,73 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 
-    <div layout:fragment="content" class="container my-3">
-        <div>
-            <h1 class="text-center">Career Review 시작 페이지</h1>
-            <div class="text-center my-3">
-                <img th:src="@{/images/background.jpg}" alt="배경" class="img-fluid" style="height:600px; width: auto;">
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <div class="bg-primary text-white py-5 mb-5">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3">당신의 커리어를<br>완벽하게 디자인하세요</h1>
+                    <p class="lead mb-4 opacity-75">
+                        이력서 작성부터 전문가 피드백, 버전 관리까지.<br>
+                        CareerBuilder가 당신의 취업 성공을 지원합니다.
+                    </p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <a href="/resume/create" class="btn btn-light btn-lg px-4 me-md-2 fw-bold text-primary">이력서 작성하기</a>
+                        <a href="/resume/list" class="btn btn-outline-light btn-lg px-4">이력서 목록</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block text-center">
+                    <i class="bi bi-file-earmark-person-fill" style="font-size: 15rem; opacity: 0.8;"></i>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Features Section -->
+    <div class="container mb-5">
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                            <i class="bi bi-pencil-square fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold">쉽고 빠른 작성</h3>
+                        <p class="text-muted">
+                            직관적인 에디터로 이력서를 손쉽게 작성하고 수정하세요. 다양한 포맷의 파일 첨부도 지원합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                            <i class="bi bi-git fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold">버전 관리 시스템</h3>
+                        <p class="text-muted">
+                            수정할 때마다 새로운 버전이 저장됩니다. 언제든지 이전 버전으로 되돌아가거나 변경 사항을 추적할 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                    <div class="card-body p-4 text-center">
+                        <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                            <i class="bi bi-chat-dots fs-3"></i>
+                        </div>
+                        <h3 class="fs-4 fw-bold">전문가 피드백</h3>
+                        <p class="text-muted">
+                            작성한 이력서에 대해 피드백을 받아보세요. 더 나은 이력서로 발전시킬 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </html>

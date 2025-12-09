@@ -30,7 +30,17 @@ public class Resume extends BaseEntity {
     private String content; // 자소서 본문
 
     @Column(length = 100)
-    private String targetCompany; // 지원 목표 기업
+    private String targetCompany; // 지원 목표 기업 (Deprecated: Application으로 이동 예정)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "application_id")
+    private Application application;
+
+    @Column
+    private Integer version;
+
+    @Column(length = 200)
+    private String commitMessage;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "file_id")

@@ -28,6 +28,8 @@ public class ResumeDto {
 
     private Long id;
 
+    private String commitMessage;
+
     private MultipartFile resumeFile;
 
     private String originalFileName;
