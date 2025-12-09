@@ -71,7 +71,6 @@
 
                 xhr.open('POST', this.action, true);
 
-                // 진행 상태 이벤트 리스너
                 xhr.upload.onprogress = function(e) {
                     if (e.lengthComputable) {
                         var percentComplete = (e.loaded / e.total) * 100;
@@ -81,19 +80,11 @@
                     }
                 };
 
-                // 완료 시 처리
                 xhr.onload = function() {
                     if (xhr.status === 200) {
-                        // 성공 시 리다이렉트 또는 결과 처리
-                        // 현재 컨트롤러는 리다이렉트나 뷰 이름을 반환하므로, 
-                        // AJAX 요청의 응답 URL이 변경되었는지(리다이렉트 되었는지) 확인하거나
-                        // 단순히 응답 내용을 현재 페이지에 덮어씌웁니다.
-                        
-                        // 리다이렉트 감지 (responseURL 사용)
                         if (xhr.responseURL && xhr.responseURL !== window.location.href) {
                              window.location.href = xhr.responseURL;
                         } else {
-                             // 에러가 있어서 다시 폼으로 돌아온 경우 (HTML 교체)
                              document.open();
                              document.write(xhr.responseText);
                              document.close();
