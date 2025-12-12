@@ -35,5 +35,6 @@ public class Application extends BaseEntity {
 
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("version DESC")
+    @Builder.Default
     private List<Resume> resumes = new ArrayList<>();
 }

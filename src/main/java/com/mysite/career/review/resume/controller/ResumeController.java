@@ -31,6 +31,14 @@ import com.mysite.career.review.resume.entity.File;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.mysite.career.review.resume.dto.ResumeSelfIntroDto;
+import com.mysite.career.review.resume.dto.ResumeCareerDto;
+import com.mysite.career.review.resume.dto.ResumeEducationDto;
+import com.mysite.career.review.resume.dto.ResumeProjectDto;
+import com.mysite.career.review.resume.dto.ResumeSkillDto;
+import com.mysite.career.review.resume.entity.ResumeSelfIntro;
+import java.util.stream.Collectors;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping(value = "/resume")
@@ -42,14 +50,18 @@ public class ResumeController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id, Principal principal) {
+    public String delete(@PathVariable("id") Long id, @RequestParam(value = "mode", defaultValue = "version") String mode, Principal principal) {
         Resume resume = resumeService.getResume(id);
 
         if(!resume.getAuthor().getUsername().equals(principal.getName()) && !principal.getName().equals("admin")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
 
-        resumeService.delete(resume);
+        if ("all".equals(mode)) {
+            resumeService.deleteAllVersions(resume);
+        } else {
+            resumeService.delete(resume);
+        }
 
         return "redirect:/resume/list";
 
@@ -94,6 +106,70 @@ public class ResumeController {
         resumeDto.setContent(resume.getContent());
         resumeDto.setTargetCompany(resume.getTargetCompany());
         resumeDto.setStatus(resume.getStatus());
+        
+        // 자소서 항목 DTO 변환
+        if (resume.getSelfIntroList() != null) {
+            List<ResumeSelfIntroDto> selfIntroDtos = resume.getSelfIntroList().stream()
+                    .map(intro -> new ResumeSelfIntroDto(intro.getQuestion(), intro.getAnswer()))
+                    .collect(Collectors.toList());
+            resumeDto.setSelfIntroList(selfIntroDtos);
+        }
+
+        // 경력 DTO 변환
+        if (resume.getCareerList() != null) {
+            List<ResumeCareerDto> careerDtos = resume.getCareerList().stream()
+                    .map(career -> ResumeCareerDto.builder()
+                            .companyName(career.getCompanyName())
+                            .department(career.getDepartment())
+                            .position(career.getPosition())
+                            .startDate(career.getStartDate())
+                            .endDate(career.getEndDate())
+                            .description(career.getDescription())
+                            .build())
+                    .collect(Collectors.toList());
+            resumeDto.setCareerList(careerDtos);
+        }
+
+        // 학력 DTO 변환
+        if (resume.getEducationList() != null) {
+            List<ResumeEducationDto> educationDtos = resume.getEducationList().stream()
+                    .map(edu -> ResumeEducationDto.builder()
+                            .schoolName(edu.getSchoolName())
+                            .major(edu.getMajor())
+                            .startDate(edu.getStartDate())
+                            .endDate(edu.getEndDate())
+                            .status(edu.getStatus())
+                            .build())
+                    .collect(Collectors.toList());
+            resumeDto.setEducationList(educationDtos);
+        }
+
+        // 프로젝트 DTO 변환
+        if (resume.getProjectList() != null) {
+            List<ResumeProjectDto> projectDtos = resume.getProjectList().stream()
+                    .map(project -> ResumeProjectDto.builder()
+                            .projectName(project.getProjectName())
+                            .startDate(project.getStartDate())
+                            .endDate(project.getEndDate())
+                            .description(project.getDescription())
+                            .gitUrl(project.getGitUrl())
+                            .demoUrl(project.getDemoUrl())
+                            .build())
+                    .collect(Collectors.toList());
+            resumeDto.setProjectList(projectDtos);
+        }
+
+        // 스킬 DTO 변환
+        if (resume.getSkillList() != null) {
+            List<ResumeSkillDto> skillDtos = resume.getSkillList().stream()
+                    .map(skill -> ResumeSkillDto.builder()
+                            .skillName(skill.getSkillName())
+                            .level(skill.getLevel())
+                            .build())
+                    .collect(Collectors.toList());
+            resumeDto.setSkillList(skillDtos);
+        }
+
         if (resume.getFile() != null) {
             resumeDto.setOriginalFileName(resume.getFile().getOriginalFileName());
         }
@@ -169,7 +245,7 @@ public class ResumeController {
         model.addAttribute("resume", resume);
         model.addAttribute("history", history);
         model.addAttribute("feedbackDto", feedbackDto);
-        log.info("==============> resume : {}", resume);
+        // log.info("==============> resume : {}", resume);
         return "resume/detail";
     }
 
@@ -181,7 +257,7 @@ public class ResumeController {
 
     @PostMapping("/create")
     public String create(@Valid @ModelAttribute ResumeDto resumeDto, BindingResult bindingResult, Principal principal) throws IOException {
-        log.info("==============> {}", resumeDto);
+        // log.info("==============> {}", resumeDto);
         if (resumeDto.getResumeFile() != null) {
             log.info("==============> File Name: {}, Size: {}", resumeDto.getResumeFile().getOriginalFilename(), resumeDto.getResumeFile().getSize());
         } else {

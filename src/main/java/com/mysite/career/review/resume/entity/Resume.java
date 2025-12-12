@@ -7,6 +7,7 @@ import com.mysite.career.review.resume.constant.ResumeStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,11 +28,37 @@ public class Resume extends BaseEntity {
     private String subject; // 지원 분야/제목
 
     @Column(columnDefinition = "TEXT")
-    private String content; // 자소서 본문
+    private String content; // 자소서 본문 (Deprecated: selfIntroList로 대체)
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ResumeSelfIntro> selfIntroList = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ResumeCareer> careerList = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ResumeEducation> educationList = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ResumeProject> projectList = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "resume", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ResumeSkill> skillList = new ArrayList<>();
 
     @Column(length = 100)
     private String targetCompany; // 지원 목표 기업 (Deprecated: Application으로 이동 예정)
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id")
     private Application application;
@@ -42,6 +69,7 @@ public class Resume extends BaseEntity {
     @Column(length = 200)
     private String commitMessage;
 
+    @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "file_id")
     private File file;
@@ -50,6 +78,7 @@ public class Resume extends BaseEntity {
     @Column(length = 20)
     private ResumeStatus status; // 진행 상태
 
+    @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "resume", cascade = CascadeType.ALL)
     private List<Feedback> feedbackList; // 피드백 리스트
 

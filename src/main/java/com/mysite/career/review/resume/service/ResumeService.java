@@ -1,12 +1,10 @@
 package com.mysite.career.review.resume.service;
 
+import com.mysite.career.review.resume.dto.*;
+import com.mysite.career.review.resume.entity.*;
 import com.mysite.career.review.user.entity.User;
 import com.mysite.career.review.resume.constant.ResumeStatus;
-import com.mysite.career.review.resume.dto.ResumeDto;
-import com.mysite.career.review.resume.entity.Application;
 import com.mysite.career.review.resume.repository.ApplicationRepository;
-import com.mysite.career.review.resume.entity.File;
-import com.mysite.career.review.resume.entity.Resume;
 import com.mysite.career.review.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -16,15 +14,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ResumeService {
 
     private final ResumeRepository resumeRepository;
@@ -62,6 +63,84 @@ public class ResumeService {
         return resume;
     }
 
+    private void mapResumeDetails(Resume resume, ResumeDto resumeDto) {
+        // Career
+        if (resumeDto.getCareerList() != null) {
+            List<ResumeCareer> careerList = resumeDto.getCareerList().stream()
+                .map(dto -> ResumeCareer.builder()
+                    .companyName(dto.getCompanyName())
+                    .department(dto.getDepartment())
+                    .position(dto.getPosition())
+                    .startDate(dto.getStartDate())
+                    .endDate(dto.getEndDate())
+                    .description(dto.getDescription())
+                    .resume(resume)
+                    .build())
+                .collect(Collectors.toList());
+            resume.setCareerList(careerList);
+        }
+
+        // Education
+        if (resumeDto.getEducationList() != null) {
+            List<ResumeEducation> educationList = resumeDto.getEducationList().stream()
+                .map(dto -> ResumeEducation.builder()
+                    .schoolName(dto.getSchoolName())
+                    .major(dto.getMajor())
+                    .startDate(dto.getStartDate())
+                    .endDate(dto.getEndDate())
+                    .status(dto.getStatus())
+                    .resume(resume)
+                    .build())
+                .collect(Collectors.toList());
+            resume.setEducationList(educationList);
+        }
+
+        // Project
+        if (resumeDto.getProjectList() != null) {
+            List<ResumeProject> projectList = resumeDto.getProjectList().stream()
+                .map(dto -> ResumeProject.builder()
+                    .projectName(dto.getProjectName())
+                    .startDate(dto.getStartDate())
+                    .endDate(dto.getEndDate())
+                    .description(dto.getDescription())
+                    .gitUrl(dto.getGitUrl())
+                    .demoUrl(dto.getDemoUrl())
+                    .resume(resume)
+                    .build())
+                .collect(Collectors.toList());
+            resume.setProjectList(projectList);
+        }
+
+        // Skill
+        if (resumeDto.getSkillList() != null) {
+            List<ResumeSkill> skillList = resumeDto.getSkillList().stream()
+                .map(dto -> ResumeSkill.builder()
+                    .skillName(dto.getSkillName())
+                    .level(dto.getLevel())
+                    .resume(resume)
+                    .build())
+                .collect(Collectors.toList());
+            resume.setSkillList(skillList);
+        }
+
+        // Self Intro
+        if (resumeDto.getSelfIntroList() != null) {
+            List<ResumeSelfIntro> selfIntroList = new ArrayList<>();
+            for (ResumeSelfIntroDto introDto : resumeDto.getSelfIntroList()) {
+                if (introDto.getQuestion() != null && !introDto.getQuestion().isEmpty()) {
+                    ResumeSelfIntro selfIntro = ResumeSelfIntro.builder()
+                            .question(introDto.getQuestion())
+                            .answer(introDto.getAnswer())
+                            .resume(resume)
+                            .build();
+                    selfIntroList.add(selfIntro);
+                }
+            }
+            resume.setSelfIntroList(selfIntroList);
+        }
+    }
+
+    @Transactional
     public void create(ResumeDto resumeDto, User user) throws IOException {
         File file = null;
 
@@ -96,9 +175,13 @@ public class ResumeService {
                 .version(1)
                 .commitMessage("Initial Commit")
                 .build();
+
+        mapResumeDetails(resume, resumeDto);
+
         resumeRepository.save(resume);              // insert
     }
 
+    @Transactional
     public Resume modify(Resume oldResume, @Valid ResumeDto resumeDto) throws IOException {
         File file = null;
 
@@ -147,10 +230,23 @@ public class ResumeService {
                 .commitMessage(resumeDto.getCommitMessage())
                 .build();
 
+        mapResumeDetails(newResume, resumeDto);
+
         return resumeRepository.save(newResume);
     }
 
+    @Transactional
     public void delete(Resume resume) {
         resumeRepository.delete(resume);
+    }
+
+    @Transactional
+    public void deleteAllVersions(Resume resume) {
+        Application application = resume.getApplication();
+        if (application != null) {
+            applicationRepository.delete(application);
+        } else {
+            resumeRepository.delete(resume);
+        }
     }
 }

@@ -25,11 +25,12 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
             + "LEFT OUTER JOIN User m1 ON q.author = m1 "
             + "LEFT OUTER JOIN Feedback f ON f.resume = q "
             + "LEFT OUTER JOIN User m2 ON f.author = m2 "
-            + "WHERE q.subject LIKE %:keyword% "
+            + "WHERE (q.subject LIKE %:keyword% "
             + "OR q.content LIKE %:keyword% "
             + "OR m1.username LIKE %:keyword% "
             + "OR m2.username LIKE %:keyword% "
-            + "OR f.content LIKE %:keyword% "
+            + "OR f.content LIKE %:keyword%) "
+            + "AND q.version = (SELECT MAX(r2.version) FROM Resume r2 WHERE r2.application = q.application)"
             , nativeQuery = false)
     Page<Resume> findAllByKeyword(String keyword, Pageable pageable);
 }

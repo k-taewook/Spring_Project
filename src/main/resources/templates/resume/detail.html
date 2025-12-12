@@ -30,32 +30,144 @@
                 </div>
             </div>
 
-            <!-- 본문 카드 -->
-            <div class="card shadow-sm border-0 rounded-3 mb-4">
-                <div class="card-body p-4">
-                    <h5 class="card-title fw-bold text-primary mb-3"><i class="bi bi-file-text me-2"></i>자기소개서 본문</h5>
-                    <div class="card-text lh-lg" th:text="${resume.content}" style="white-space: pre-line; min-height: 200px;"></div>
-                </div>
-            </div>
+            <!-- 탭 네비게이션 -->
+            <ul class="nav nav-tabs mb-4" id="detailTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold" id="resume-info-tab" data-bs-toggle="tab" data-bs-target="#resume-info" type="button" role="tab" aria-controls="resume-info" aria-selected="true">
+                        <i class="bi bi-person-lines-fill me-2"></i>이력서 정보
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold" id="self-intro-tab" data-bs-toggle="tab" data-bs-target="#self-intro" type="button" role="tab" aria-controls="self-intro" aria-selected="false">
+                        <i class="bi bi-file-text me-2"></i>자기소개서
+                    </button>
+                </li>
+            </ul>
 
-            <!-- 첨부 파일 카드 -->
-            <div class="card shadow-sm border-0 rounded-3 mb-4" th:if="${resume.file != null}">
-                <div class="card-body p-4">
-                    <h5 class="card-title fw-bold text-primary mb-3"><i class="bi bi-paperclip me-2"></i>첨부 파일</h5>
-                    <div class="d-flex align-items-center p-3 bg-light rounded border">
-                        <i class="bi bi-file-earmark-text fs-3 text-secondary me-3"></i>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold" th:text="${resume.file.originalFileName}">filename.pdf</div>
-                            <div class="small text-muted" th:if="${resume.file.fileSize != null}" th:text="|${#numbers.formatInteger(resume.file.fileSize / 1024, 0, 'COMMA')} KB|"></div>
+            <div class="tab-content" id="detailTabContent">
+                <!-- 1. 이력서 정보 탭 -->
+                <div class="tab-pane fade show active" id="resume-info" role="tabpanel" aria-labelledby="resume-info-tab">
+                    <!-- 기술 스택 -->
+                    <div class="mb-4" th:if="${!#lists.isEmpty(resume.skillList)}">
+                        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-tools me-2"></i>기술 스택</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span th:each="skill : ${resume.skillList}" class="badge bg-light text-dark border p-2">
+                                <i class="bi bi-code-slash me-1"></i>
+                                <span th:text="${skill.skillName}">Java</span>
+                                <span class="badge bg-secondary ms-1" th:text="${skill.level}">상</span>
+                            </span>
                         </div>
-                        <div>
-                            <a th:href="@{|/resume/download/${resume.id}|}" class="btn btn-outline-dark btn-sm me-1">
-                                <i class="bi bi-download me-1"></i>다운로드
-                            </a>
-                            <a th:if="${#strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.pdf') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.jpg') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.png')}"
-                               th:href="@{|/resume/view/${resume.id}|}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-eye me-1"></i>미리보기
-                            </a>
+                    </div>
+
+                    <!-- 프로젝트 경험 -->
+                    <div class="mb-4" th:if="${!#lists.isEmpty(resume.projectList)}">
+                        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-kanban me-2"></i>프로젝트 경험</h5>
+                        <div th:each="project : ${resume.projectList}" class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0" th:text="${project.projectName}">Project Name</h5>
+                                    <small class="text-muted" th:text="|${project.startDate} ~ ${project.endDate}|">2023-01 ~ 2023-06</small>
+                                </div>
+                                <p class="card-text text-muted mb-3" th:text="${project.description}">Description</p>
+                                <div class="d-flex gap-2">
+                                    <a th:if="${project.gitUrl != null and project.gitUrl != ''}" th:href="${project.gitUrl}" target="_blank" class="btn btn-sm btn-outline-dark">
+                                        <i class="bi bi-github me-1"></i>GitHub
+                                    </a>
+                                    <a th:if="${project.demoUrl != null and project.demoUrl != ''}" th:href="${project.demoUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-link-45deg me-1"></i>Demo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 경력 사항 -->
+                    <div class="mb-4" th:if="${!#lists.isEmpty(resume.careerList)}">
+                        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-briefcase me-2"></i>경력 사항</h5>
+                        <div th:each="career : ${resume.careerList}" class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h5 class="card-title fw-bold mb-1" th:text="${career.companyName}">Company</h5>
+                                        <div class="text-muted small" th:text="${career.position}">Position</div>
+                                    </div>
+                                    <small class="text-muted" th:text="|${career.startDate} ~ ${career.endDate}|">2020-01 ~ 2022-12</small>
+                                </div>
+                                <p class="card-text mt-2" th:text="${career.description}">Description</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 학력 사항 -->
+                    <div class="mb-4" th:if="${!#lists.isEmpty(resume.educationList)}">
+                        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-mortarboard me-2"></i>학력 사항</h5>
+                        <div th:each="edu : ${resume.educationList}" class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title fw-bold mb-1" th:text="${edu.schoolName}">School</h5>
+                                        <div class="text-muted small" th:text="${edu.major}">Major</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="badge bg-secondary mb-1" th:text="${edu.status}">졸업</div>
+                                        <div class="small text-muted" th:text="|${edu.startDate} ~ ${edu.endDate}|">2016-03 ~ 2020-02</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 첨부 파일 카드 (이력서 탭) -->
+                    <div class="card shadow-sm border-0 rounded-3 mb-4" th:if="${resume.file != null}">
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold text-primary mb-3"><i class="bi bi-paperclip me-2"></i>첨부 파일</h5>
+                            <div class="d-flex align-items-center p-3 bg-light rounded border">
+                                <i class="bi bi-file-earmark-text fs-3 text-secondary me-3"></i>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold" th:text="${resume.file.originalFileName}">filename.pdf</div>
+                                    <div class="small text-muted" th:if="${resume.file.fileSize != null}" th:text="|${#numbers.formatInteger(resume.file.fileSize / 1024, 0, 'COMMA')} KB|"></div>
+                                </div>
+                                <div>
+                                    <a th:href="@{|/resume/download/${resume.id}|}" class="btn btn-outline-dark btn-sm me-1">
+                                        <i class="bi bi-download me-1"></i>다운로드
+                                    </a>
+                                    <a th:if="${#strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.pdf') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.jpg') or #strings.endsWith(#strings.toLowerCase(resume.file.originalFileName), '.png')}"
+                                       th:href="@{|/resume/view/${resume.id}|}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>미리보기
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 자기소개서 탭 -->
+                <div class="tab-pane fade" id="self-intro" role="tabpanel" aria-labelledby="self-intro-tab">
+                    <!-- 통합된 자소서 카드 -->
+                    <div class="card shadow-sm border-0 rounded-3 mb-3">
+                        <div class="card-body p-5">
+                            <!-- 자소서 항목 리스트 -->
+                            <div th:each="intro, stat : ${resume.selfIntroList}">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold text-dark mb-3" th:text="${intro.question}">질문 제목</h6>
+                                    <div class="card-text lh-lg text-break" th:text="${intro.answer}" style="white-space: pre-line;">답변 내용</div>
+                                </div>
+                                <!-- 항목 간 구분선 (마지막 항목 제외) -->
+                                <hr class="my-5 text-secondary opacity-25" th:if="${!stat.last}">
+                            </div>
+                            
+                            <!-- 데이터가 없을 경우 안내 -->
+                            <div th:if="${#lists.isEmpty(resume.selfIntroList)}" class="text-center text-muted py-5">
+                                작성된 자기소개서 항목이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 기존 content 필드 (하위 호환성) -->
+                    <div class="card shadow-sm border-0 rounded-3 mb-4" th:if="${resume.content != null and resume.content != '' and resume.content != 'Dynamic Content'}">
+                        <div class="card-body p-4">
+                            <h6 class="card-title fw-bold text-secondary mb-3">기타 / 추가 내용</h6>
+                            <div class="card-text lh-lg" th:text="${resume.content}" style="white-space: pre-line;"></div>
                         </div>
                     </div>
                 </div>
@@ -118,7 +230,7 @@
                              sec:authorize="isAuthenticated()"
                              th:if="${feedback.author != null and (#authentication.getPrincipal().getUsername() == feedback.author.username or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}">
                             <a th:href="@{|/feedback/modify/${feedback.id}|}" class="btn btn-sm btn-outline-secondary me-1">수정</a>
-                            <a href="javascript:void(0)" th:data-uri="@{|/feedback/delete/${feedback.id}|}" class="delete btn btn-sm btn-outline-danger">삭제</a>
+                            <a href="javascript:void(0)" th:data-uri="@{|/feedback/delete/${feedback.id}|}" class="delete-feedback btn btn-sm btn-outline-danger">삭제</a>
                         </div>
                     </div>
                 </div>
@@ -163,13 +275,87 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">이력서 삭제</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>삭제 옵션을 선택해주세요.</p>
+                    <p class="text-muted small mb-0">- 현재 버전만 삭제: 현재 보고 있는 이력서 버전만 삭제합니다.</p>
+                    <p class="text-muted small">- 전체 삭제: 이 이력서의 모든 버전 히스토리를 삭제합니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-warning" id="btnDeleteVersion">현재 버전만 삭제</button>
+                    <button type="button" class="btn btn-danger" id="btnDeleteAll">전체 삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script layout:fragment="script" type='text/javascript'>
-        const delete_elements = document.getElementsByClassName("delete");
-        Array.from(delete_elements).forEach(function(element) {
-            element.addEventListener('click', function() {
-                if(confirm("정말로 삭제하시겠습니까?")) {
-                    location.href = this.dataset.uri;
+        document.addEventListener('DOMContentLoaded', function() {
+            const delete_elements = document.getElementsByClassName("delete");
+            const deleteModalEl = document.getElementById('deleteModal');
+            let deleteModal = null;
+
+            // Bootstrap 초기화 시도 (window.bootstrap 또는 bootstrap 변수 확인)
+            try {
+                if (typeof bootstrap !== 'undefined') {
+                    deleteModal = new bootstrap.Modal(deleteModalEl);
+                } else if (window.bootstrap) {
+                    deleteModal = new window.bootstrap.Modal(deleteModalEl);
                 }
+            } catch (e) {
+                console.error("Bootstrap Modal initialization failed:", e);
+            }
+
+            const btnDeleteVersion = document.getElementById('btnDeleteVersion');
+            const btnDeleteAll = document.getElementById('btnDeleteAll');
+            let deleteUri = '';
+
+            Array.from(delete_elements).forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    deleteUri = this.dataset.uri;
+                    
+                    if (deleteModal) {
+                        deleteModal.show();
+                    } else {
+                        // Bootstrap 로드 실패 시 폴백 (기본 confirm 창)
+                        if(confirm("삭제 옵션창을 열 수 없습니다. 현재 버전만 삭제하시겠습니까?")) {
+                             location.href = this.dataset.uri;
+                        }
+                    }
+                });
+            });
+
+            if (btnDeleteVersion) {
+                btnDeleteVersion.addEventListener('click', function() {
+                    location.href = deleteUri + "?mode=version";
+                });
+            }
+
+            if (btnDeleteAll) {
+                btnDeleteAll.addEventListener('click', function() {
+                    if(confirm("정말로 모든 버전을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
+                        location.href = deleteUri + "?mode=all";
+                    }
+                });
+            }
+
+            // 피드백 삭제 (단순 확인)
+            const delete_feedback_elements = document.getElementsByClassName("delete-feedback");
+            Array.from(delete_feedback_elements).forEach(function(element) {
+                element.addEventListener('click', function() {
+                    if(confirm("정말로 삭제하시겠습니까?")) {
+                        location.href = this.dataset.uri;
+                    }
+                });
             });
         });
     </script>

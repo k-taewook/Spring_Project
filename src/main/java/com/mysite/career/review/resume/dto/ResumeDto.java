@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.ToString;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data                                   // getter, setter, ToString 등등 모든 기능 있음
@@ -19,8 +22,23 @@ public class ResumeDto {
     @NotEmpty(message = "제목은 필수 항목 입니다.")
     private String subject;
 
-    @NotEmpty(message = "내용은 필수 항목 입니다.")
+    // @NotEmpty(message = "내용은 필수 항목 입니다.") // Deprecated
     private String content;
+
+    @Builder.Default
+    private List<ResumeSelfIntroDto> selfIntroList = new ArrayList<>();
+
+    @Builder.Default
+    private List<ResumeCareerDto> careerList = new ArrayList<>();
+
+    @Builder.Default
+    private List<ResumeEducationDto> educationList = new ArrayList<>();
+
+    @Builder.Default
+    private List<ResumeProjectDto> projectList = new ArrayList<>();
+
+    @Builder.Default
+    private List<ResumeSkillDto> skillList = new ArrayList<>();
 
     private String targetCompany;
 
@@ -30,6 +48,7 @@ public class ResumeDto {
 
     private String commitMessage;
 
+    @ToString.Exclude
     private MultipartFile resumeFile;
 
     private String originalFileName;

@@ -18,60 +18,286 @@
                 <div class="card-body p-5 bg-light">
                     <form method="post" th:object="${resumeDto}" enctype="multipart/form-data" class="needs-validation" novalidate>
                         
-                        <!-- 기본 정보 섹션 -->
-                        <h5 class="text-primary mb-3 border-bottom pb-2"><i class="bi bi-info-circle me-2"></i>기본 정보</h5>
-                        
-                        <div class="mb-4">
-                            <label for="subject" class="form-label fw-bold">지원 분야 / 제목 <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-lg" id="subject" name="subject" th:field="*{subject}" placeholder="예: 2024년 상반기 공채 지원 - 홍길동">
-                            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">제목을 입력해주세요.</div>
-                        </div>
+                        <!-- 탭 네비게이션 -->
+                        <ul class="nav nav-tabs mb-4" id="resumeTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold" id="resume-info-tab" data-bs-toggle="tab" data-bs-target="#resume-info" type="button" role="tab" aria-controls="resume-info" aria-selected="true">
+                                    <i class="bi bi-person-lines-fill me-2"></i>이력서 정보
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold" id="self-intro-tab" data-bs-toggle="tab" data-bs-target="#self-intro" type="button" role="tab" aria-controls="self-intro" aria-selected="false">
+                                    <i class="bi bi-file-text me-2"></i>자기소개서
+                                </button>
+                            </li>
+                        </ul>
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="targetCompany" class="form-label fw-bold">지원 목표 기업</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-building"></i></span>
-                                    <input type="text" class="form-control" id="targetCompany" name="targetCompany" th:field="*{targetCompany}" placeholder="예: 삼성전자, 네이버">
+                        <div class="tab-content" id="resumeTabContent">
+                            <!-- 1. 이력서 정보 탭 -->
+                            <div class="tab-pane fade show active" id="resume-info" role="tabpanel" aria-labelledby="resume-info-tab">
+                                <!-- 기본 정보 섹션 -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2"><i class="bi bi-info-circle me-2"></i>기본 정보</h5>
+                                
+                                <div class="mb-4">
+                                    <label for="subject" class="form-label fw-bold">지원 분야 / 제목 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-lg" id="subject" name="subject" th:field="*{subject}" placeholder="예: 2024년 상반기 공채 지원 - 홍길동">
+                                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">제목을 입력해주세요.</div>
                                 </div>
-                            </div>
-                            <div class="col-md-6" th:if="${resumeDto.status != null}">
-                                <label for="status" class="form-label fw-bold">진행 상태</label>
-                                <select class="form-select" id="status" name="status" th:field="*{status}">
-                                    <option value="WAITING">요청중 (첨삭 대기)</option>
-                                    <option value="COMPLETED">첨삭완료</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <!-- 자기소개서 본문 섹션 -->
-                        <h5 class="text-primary mb-3 border-bottom pb-2 mt-5"><i class="bi bi-file-text me-2"></i>자기소개서 본문</h5>
-                        
-                        <div class="mb-4">
-                            <textarea class="form-control" id="content" name="content" th:field="*{content}" rows="15" placeholder="자기소개서 내용을 자유롭게 작성해주세요."></textarea>
-                            <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용을 입력해주세요.</div>
-                        </div>
-
-                        <!-- 파일 첨부 섹션 -->
-                        <h5 class="text-primary mb-3 border-bottom pb-2 mt-5"><i class="bi bi-paperclip me-2"></i>첨부 파일</h5>
-                        
-                        <div class="mb-4">
-                            <div class="card bg-white border-secondary border-opacity-25">
-                                <div class="card-body">
-                                    <label for="resumeFile" class="form-label fw-bold">포트폴리오 또는 이력서 파일 (PDF, Word 등)</label>
-                                    <input type="file" class="form-control" id="resumeFile" name="resumeFile">
-                                    <div class="form-text text-muted">
-                                        <i class="bi bi-info-circle-fill"></i> 지원 가능한 형식: .pdf, .docx, .hwp, .zip
-                                    </div>
-                                    
-                                    <div th:if="${resumeDto.originalFileName != null}" class="alert alert-info mt-3 d-flex align-items-center" role="alert">
-                                        <i class="bi bi-file-earmark-check-fill fs-4 me-2"></i>
-                                        <div>
-                                            <strong>현재 등록된 파일:</strong> 
-                                            <span th:text="${resumeDto.originalFileName}">filename.pdf</span>
-                                            <div class="small text-muted mt-1">새 파일을 업로드하면 기존 파일은 대체됩니다.</div>
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label for="targetCompany" class="form-label fw-bold">지원 목표 기업</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                            <input type="text" class="form-control" id="targetCompany" name="targetCompany" th:field="*{targetCompany}" placeholder="예: 삼성전자, 네이버">
                                         </div>
                                     </div>
+                                    <div class="col-md-6" th:if="${resumeDto.status != null}">
+                                        <label for="status" class="form-label fw-bold">진행 상태</label>
+                                        <select class="form-select" id="status" name="status" th:field="*{status}">
+                                            <option value="WAITING">요청중 (첨삭 대기)</option>
+                                            <option value="COMPLETED">첨삭완료</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- 기술 스택 (Skills) -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2 mt-5">
+                                    <i class="bi bi-tools me-2"></i>기술 스택 (Skills)
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="addSkill()">
+                                        <i class="bi bi-plus-lg"></i> 추가
+                                    </button>
+                                </h5>
+                                <div id="skill-container" class="row g-3 mb-4">
+                                    <!-- 기존 스킬 렌더링 -->
+                                    <div th:each="skill, stat : *{skillList}" class="col-md-6 skill-item">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                                            <input type="text" class="form-control" th:name="|skillList[${stat.index}].skillName|" th:value="${skill.skillName}" placeholder="Java, Python...">
+                                            <select class="form-select" th:name="|skillList[${stat.index}].level|" style="max-width: 100px;">
+                                                <option value="상" th:selected="${skill.level == '상'}">상</option>
+                                                <option value="중" th:selected="${skill.level == '중'}">중</option>
+                                                <option value="하" th:selected="${skill.level == '하'}">하</option>
+                                            </select>
+                                            <button type="button" class="btn btn-outline-danger" onclick="removeElement(this)"><i class="bi bi-x-lg"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 프로젝트 경험 -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2 mt-5">
+                                    <i class="bi bi-kanban me-2"></i>프로젝트 경험
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="addProject()">
+                                        <i class="bi bi-plus-lg"></i> 추가
+                                    </button>
+                                </h5>
+                                <div id="project-container">
+                                    <div th:each="project, stat : *{projectList}" class="card mb-3 bg-light border-0 project-item">
+                                        <div class="card-body position-relative">
+                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">프로젝트명</label>
+                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].projectName|" th:value="${project.projectName}">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">시작일</label>
+                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].startDate|" th:value="${project.startDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">종료일</label>
+                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].endDate|" th:value="${project.endDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">설명</label>
+                                                    <textarea class="form-control" rows="3" th:name="|projectList[${stat.index}].description|" th:text="${project.description}"></textarea>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold"><i class="bi bi-github me-1"></i>Git URL</label>
+                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].gitUrl|" th:value="${project.gitUrl}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold"><i class="bi bi-link-45deg me-1"></i>Demo URL</label>
+                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].demoUrl|" th:value="${project.demoUrl}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 경력 사항 -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2 mt-5">
+                                    <i class="bi bi-briefcase me-2"></i>경력 사항
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="addCareer()">
+                                        <i class="bi bi-plus-lg"></i> 추가
+                                    </button>
+                                </h5>
+                                <div id="career-container">
+                                    <div th:each="career, stat : *{careerList}" class="card mb-3 bg-light border-0 career-item">
+                                        <div class="card-body position-relative">
+                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">회사명</label>
+                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].companyName|" th:value="${career.companyName}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">부서/직책</label>
+                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].position|" th:value="${career.position}">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">입사일</label>
+                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].startDate|" th:value="${career.startDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">퇴사일</label>
+                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].endDate|" th:value="${career.endDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label fw-bold">담당 업무</label>
+                                                    <textarea class="form-control" rows="3" th:name="|careerList[${stat.index}].description|" th:text="${career.description}"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 학력 사항 -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2 mt-5">
+                                    <i class="bi bi-mortarboard me-2"></i>학력 사항
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="addEducation()">
+                                        <i class="bi bi-plus-lg"></i> 추가
+                                    </button>
+                                </h5>
+                                <div id="education-container" class="mb-5">
+                                    <div th:each="edu, stat : *{educationList}" class="card mb-3 bg-light border-0 education-item">
+                                        <div class="card-body position-relative">
+                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">학교명</label>
+                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].schoolName|" th:value="${edu.schoolName}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-bold">전공</label>
+                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].major|" th:value="${edu.major}">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">입학일</label>
+                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].startDate|" th:value="${edu.startDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">졸업일</label>
+                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].endDate|" th:value="${edu.endDate}" placeholder="YYYY-MM">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label fw-bold">상태</label>
+                                                    <select class="form-select" th:name="|educationList[${stat.index}].status|">
+                                                        <option value="졸업" th:selected="${edu.status == '졸업'}">졸업</option>
+                                                        <option value="재학" th:selected="${edu.status == '재학'}">재학</option>
+                                                        <option value="휴학" th:selected="${edu.status == '휴학'}">휴학</option>
+                                                        <option value="중퇴" th:selected="${edu.status == '중퇴'}">중퇴</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 파일 첨부 섹션 (이력서 탭으로 이동) -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2 mt-5"><i class="bi bi-paperclip me-2"></i>첨부 파일</h5>
+                                <div class="mb-4">
+                                    <div class="card bg-white border-secondary border-opacity-25">
+                                        <div class="card-body">
+                                            <label for="resumeFile" class="form-label fw-bold">포트폴리오 또는 이력서 파일 (PDF, Word 등)</label>
+                                            <input type="file" class="form-control" id="resumeFile" name="resumeFile">
+                                            <div class="form-text text-muted">
+                                                <i class="bi bi-info-circle-fill"></i> 지원 가능한 형식: .pdf, .docx, .hwp, .zip
+                                            </div>
+                                            
+                                            <div th:if="${resumeDto.originalFileName != null}" class="alert alert-info mt-3 d-flex align-items-center" role="alert">
+                                                <i class="bi bi-file-earmark-check-fill fs-4 me-2"></i>
+                                                <div>
+                                                    <strong>현재 등록된 파일:</strong> 
+                                                    <span th:text="${resumeDto.originalFileName}">filename.pdf</span>
+                                                    <div class="small text-muted mt-1">새 파일을 업로드하면 기존 파일은 대체됩니다.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. 자기소개서 탭 -->
+                            <div class="tab-pane fade" id="self-intro" role="tabpanel" aria-labelledby="self-intro-tab">
+                                <!-- 자기소개서 본문 섹션 (동적 추가 방식) -->
+                                <h5 class="text-primary mb-3 border-bottom pb-2">
+                                    <i class="bi bi-file-text me-2"></i>자기소개서 항목
+                                </h5>
+                                
+                                <div id="self-intro-container">
+                                    <!-- Top Add Zone -->
+                                    <div class="add-section-zone" onclick="addSection(this)">
+                                        <div class="add-section-btn"><i class="bi bi-plus-lg"></i> 항목 추가</div>
+                                    </div>
+
+                                    <!-- 기존 데이터가 있을 경우 렌더링 -->
+                                    <div th:each="intro, stat : *{selfIntroList}" class="self-intro-wrapper">
+                                        <div class="card mb-4 shadow-sm border-0 bg-light self-intro-item">
+                                            <div class="card-body position-relative">
+                                                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close" onclick="removeSection(this)"></button>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">소제목 (질문)</label>
+                                                    <input type="text" class="form-control" 
+                                                           th:name="|selfIntroList[${stat.index}].question|" 
+                                                           th:value="${intro.question}" 
+                                                           placeholder="예: 성장과정, 지원동기">
+                                                </div>
+                                                <div class="mb-0">
+                                                    <label class="form-label fw-bold">내용 (답변)</label>
+                                                    <textarea class="form-control" rows="5" 
+                                                              th:name="|selfIntroList[${stat.index}].answer|" 
+                                                              th:text="${intro.answer}" 
+                                                              placeholder="내용을 입력해주세요."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Bottom Add Zone for each item -->
+                                        <div class="add-section-zone" onclick="addSection(this)">
+                                            <div class="add-section-btn"><i class="bi bi-plus-lg"></i> 항목 추가</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 기존 content 필드는 하위 호환성을 위해 hidden으로 두거나 제거 (여기서는 제거하고 빈 값 처리) -->
+                        <input type="hidden" name="content" value="Dynamic Content">
+
+                        <!-- 커밋 메시지 (수정 시에만 표시) -->
+                        <div class="card bg-warning bg-opacity-10 border-warning mb-4 mt-5" th:if="${resumeDto.id != null}">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning-emphasis fw-bold"><i class="bi bi-git me-2"></i>변경 사항 기록 (Commit Message)</h5>
+                                <div class="mb-3">
+                                    <label for="commitMessage" class="form-label">이번 버전의 주요 변경 내용을 요약해주세요.</label>
+                                    <input type="text" class="form-control border-warning" id="commitMessage" name="commitMessage" th:field="*{commitMessage}" placeholder="예: 1번 항목 경험 서술 보완, 오타 수정">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-5">
+                            <a th:href="@{/resume/list}" class="btn btn-secondary btn-lg px-4">취소</a>
+                            <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
+                                <i class="bi bi-save me-2"></i>저장하기
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
                                     <!-- Progress Bar -->
                                     <div id="progress-container" class="mt-3" style="display: none;">
@@ -109,12 +335,247 @@
         </div>
     </div>
 
-    <script>
+    <script layout:fragment="script" type='text/javascript'>
+        // --- Self Intro Functions ---
+        function addSection(triggerZone) {
+            const container = document.getElementById('self-intro-container');
+            
+            let html = '<div class="self-intro-wrapper">';
+            html += '<div class="card mb-4 shadow-sm border-0 bg-light self-intro-item">';
+            html += '<div class="card-body position-relative">';
+            html += '<button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Close" onclick="removeSection(this)"></button>';
+            html += '<div class="mb-3">';
+            html += '<label class="form-label fw-bold">소제목 (질문)</label>';
+            html += '<input type="text" class="form-control" name="temp_question" placeholder="예: 성장과정, 지원동기">';
+            html += '</div>';
+            html += '<div class="mb-0">';
+            html += '<label class="form-label fw-bold">내용 (답변)</label>';
+            html += '<textarea class="form-control" rows="5" name="temp_answer" placeholder="내용을 입력해주세요."></textarea>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="add-section-zone" onclick="addSection(this)">';
+            html += '<div class="add-section-btn"><i class="bi bi-plus-lg"></i> 항목 추가</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            if (triggerZone) {
+                if (triggerZone.parentNode === container) {
+                     triggerZone.insertAdjacentHTML('afterend', html);
+                } else {
+                    const wrapper = triggerZone.closest('.self-intro-wrapper');
+                    wrapper.insertAdjacentHTML('afterend', html);
+                }
+            } else {
+                container.insertAdjacentHTML('beforeend', html);
+            }
+            reindexSections();
+        }
+
+        function removeSection(btn) {
+            const wrapper = btn.closest('.self-intro-wrapper');
+            wrapper.remove();
+            reindexSections();
+        }
+
+        function reindexSections() {
+            const container = document.getElementById('self-intro-container');
+            const wrappers = container.querySelectorAll('.self-intro-wrapper');
+            
+            wrappers.forEach((wrapper, index) => {
+                const questionInput = wrapper.querySelector('input[type="text"]');
+                const answerInput = wrapper.querySelector('textarea');
+                
+                if(questionInput) questionInput.name = `selfIntroList[${index}].question`;
+                if(answerInput) answerInput.name = `selfIntroList[${index}].answer`;
+            });
+        }
+
+        // --- Resume Info Functions ---
+        function addSkill() {
+            const container = document.getElementById('skill-container');
+            const index = container.children.length;
+            let html = `
+                <div class="col-md-6 skill-item">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-code-slash"></i></span>
+                        <input type="text" class="form-control" name="skillList[${index}].skillName" placeholder="Java, Python...">
+                        <select class="form-select" name="skillList[${index}].level" style="max-width: 100px;">
+                            <option value="상">상</option>
+                            <option value="중">중</option>
+                            <option value="하">하</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeElement(this)"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addProject() {
+            const container = document.getElementById('project-container');
+            const index = container.children.length;
+            let html = `
+                <div class="card mb-3 bg-light border-0 project-item">
+                    <div class="card-body position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">프로젝트명</label>
+                                <input type="text" class="form-control" name="projectList[${index}].projectName">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">시작일</label>
+                                <input type="text" class="form-control" name="projectList[${index}].startDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">종료일</label>
+                                <input type="text" class="form-control" name="projectList[${index}].endDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">설명</label>
+                                <textarea class="form-control" rows="3" name="projectList[${index}].description"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="bi bi-github me-1"></i>Git URL</label>
+                                <input type="text" class="form-control" name="projectList[${index}].gitUrl">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="bi bi-link-45deg me-1"></i>Demo URL</label>
+                                <input type="text" class="form-control" name="projectList[${index}].demoUrl">
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addCareer() {
+            const container = document.getElementById('career-container');
+            const index = container.children.length;
+            let html = `
+                <div class="card mb-3 bg-light border-0 career-item">
+                    <div class="card-body position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">회사명</label>
+                                <input type="text" class="form-control" name="careerList[${index}].companyName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">부서/직책</label>
+                                <input type="text" class="form-control" name="careerList[${index}].position">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">입사일</label>
+                                <input type="text" class="form-control" name="careerList[${index}].startDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">퇴사일</label>
+                                <input type="text" class="form-control" name="careerList[${index}].endDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">담당 업무</label>
+                                <textarea class="form-control" rows="3" name="careerList[${index}].description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addEducation() {
+            const container = document.getElementById('education-container');
+            const index = container.children.length;
+            let html = `
+                <div class="card mb-3 bg-light border-0 education-item">
+                    <div class="card-body position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="removeElement(this)"></button>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">학교명</label>
+                                <input type="text" class="form-control" name="educationList[${index}].schoolName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">전공</label>
+                                <input type="text" class="form-control" name="educationList[${index}].major">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">입학일</label>
+                                <input type="text" class="form-control" name="educationList[${index}].startDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">졸업일</label>
+                                <input type="text" class="form-control" name="educationList[${index}].endDate" placeholder="YYYY-MM">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">상태</label>
+                                <select class="form-select" name="educationList[${index}].status">
+                                    <option value="졸업">졸업</option>
+                                    <option value="재학">재학</option>
+                                    <option value="휴학">휴학</option>
+                                    <option value="중퇴">중퇴</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeElement(btn) {
+            // Find the closest parent with class ending in '-item' or 'col-md-6' for skills
+            let target = btn.closest('.card') || btn.closest('.skill-item');
+            target.remove();
+            reindexAll();
+        }
+
+        function reindexAll() {
+            // Reindex Skills
+            document.querySelectorAll('#skill-container .skill-item').forEach((item, i) => {
+                item.querySelector('input').name = `skillList[${i}].skillName`;
+                item.querySelector('select').name = `skillList[${i}].level`;
+            });
+            // Reindex Projects
+            document.querySelectorAll('#project-container .project-item').forEach((item, i) => {
+                item.querySelector('input[name$=".projectName"]').name = `projectList[${i}].projectName`;
+                item.querySelector('input[name$=".startDate"]').name = `projectList[${i}].startDate`;
+                item.querySelector('input[name$=".endDate"]').name = `projectList[${i}].endDate`;
+                item.querySelector('textarea').name = `projectList[${i}].description`;
+                item.querySelector('input[name$=".gitUrl"]').name = `projectList[${i}].gitUrl`;
+                item.querySelector('input[name$=".demoUrl"]').name = `projectList[${i}].demoUrl`;
+            });
+            // Reindex Career
+            document.querySelectorAll('#career-container .career-item').forEach((item, i) => {
+                item.querySelector('input[name$=".companyName"]').name = `careerList[${i}].companyName`;
+                item.querySelector('input[name$=".position"]').name = `careerList[${i}].position`;
+                item.querySelector('input[name$=".startDate"]').name = `careerList[${i}].startDate`;
+                item.querySelector('input[name$=".endDate"]').name = `careerList[${i}].endDate`;
+                item.querySelector('textarea').name = `careerList[${i}].description`;
+            });
+            // Reindex Education
+            document.querySelectorAll('#education-container .education-item').forEach((item, i) => {
+                item.querySelector('input[name$=".schoolName"]').name = `educationList[${i}].schoolName`;
+                item.querySelector('input[name$=".major"]').name = `educationList[${i}].major`;
+                item.querySelector('input[name$=".startDate"]').name = `educationList[${i}].startDate`;
+                item.querySelector('input[name$=".endDate"]').name = `educationList[${i}].endDate`;
+                item.querySelector('select').name = `educationList[${i}].status`;
+            });
+        }
+
+        // 초기 로딩 시 항목이 하나도 없으면 하나 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('self-intro-container');
+            if (container.querySelectorAll('.self-intro-wrapper').length === 0) {
+                const topZone = container.querySelector('.add-section-zone');
+                if(topZone) addSection(topZone);
+            }
+        });
+
         document.querySelector('form').addEventListener('submit', function(e) {
+            // 일반적인 폼 제출 로직 (파일 업로드 프로그레스바 등)
             var fileInput = document.getElementById('resumeFile');
-            // 파일이 있거나, 폼이 유효한 경우 (여기서는 간단히 파일 업로드 UX만 처리)
             if (fileInput.files.length > 0) {
-                e.preventDefault(); // 기본 제출 막기
+                e.preventDefault(); // 기본 제출 막고 AJAX로 처리
                 
                 var formData = new FormData(this);
                 var xhr = new XMLHttpRequest();
@@ -141,18 +602,15 @@
                 // 완료 시 처리
                 xhr.onload = function() {
                     if (xhr.status === 200) {
-                        // 리다이렉트 처리
-                        if (xhr.responseURL && xhr.responseURL !== window.location.href) {
-                             window.location.href = xhr.responseURL;
-                        } else {
-                             document.open();
-                             document.write(xhr.responseText);
-                             document.close();
-                        }
+                        // 리다이렉트 처리 (서버가 리다이렉트 응답을 주면 그 URL로 이동)
+                        // 주의: AJAX 요청은 서버의 302 리다이렉트를 자동으로 따르지만, 
+                        // 최종 URL을 알기 위해 responseURL을 확인하거나 서버에서 JSON으로 URL을 줘야 함.
+                        // 여기서는 간단히 목록으로 이동하거나 현재 페이지 리로드
+                        window.location.href = "/resume/list"; 
                     } else {
                         alert('업로드 중 오류가 발생했습니다.');
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>저장하기';
+                        submitBtn.innerHTML = '저장하기';
                         progressContainer.style.display = 'none';
                     }
                 };
@@ -160,12 +618,13 @@
                 xhr.onerror = function() {
                     alert('네트워크 오류가 발생했습니다.');
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="bi bi-save me-2"></i>저장하기';
+                    submitBtn.innerHTML = '저장하기';
                     progressContainer.style.display = 'none';
                 };
 
                 xhr.send(formData);
             }
+            // 파일이 없으면 그냥 폼 제출 (기본 동작)
         });
     </script>
 </div>
