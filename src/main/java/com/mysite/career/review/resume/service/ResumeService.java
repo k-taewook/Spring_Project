@@ -4,6 +4,7 @@ import com.mysite.career.review.resume.dto.*;
 import com.mysite.career.review.resume.entity.*;
 import com.mysite.career.review.user.entity.User;
 import com.mysite.career.review.resume.constant.ResumeStatus;
+import com.mysite.career.review.resume.constant.ResumeVisibility;
 import com.mysite.career.review.resume.repository.ApplicationRepository;
 import com.mysite.career.review.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -174,6 +175,7 @@ public class ResumeService {
                 .application(application)
                 .version(1)
                 .commitMessage("Initial Commit")
+                .visibility(resumeDto.getVisibility() != null ? resumeDto.getVisibility() : ResumeVisibility.PUBLIC)
                 .build();
 
         mapResumeDetails(resume, resumeDto);
@@ -228,11 +230,26 @@ public class ResumeService {
                 .application(application)
                 .version(nextVersion)
                 .commitMessage(resumeDto.getCommitMessage())
+                .visibility(resumeDto.getVisibility() != null ? resumeDto.getVisibility() : oldResume.getVisibility())
                 .build();
 
         mapResumeDetails(newResume, resumeDto);
 
         return resumeRepository.save(newResume);
+    }
+
+    public Page<Resume> getMyResumes(int page, User user) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("created"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return resumeRepository.findLatestByAuthor(user, pageable);
+    }
+
+    @Transactional
+    public void updateVisibility(Long id, ResumeVisibility visibility) {
+        Resume resume = getResume(id);
+        resume.setVisibility(visibility);
+        resumeRepository.save(resume);
     }
 
     @Transactional

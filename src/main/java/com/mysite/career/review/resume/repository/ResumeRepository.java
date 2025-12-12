@@ -1,11 +1,14 @@
 package com.mysite.career.review.resume.repository;
 
 import com.mysite.career.review.resume.entity.Resume;
+import com.mysite.career.review.user.entity.User;
+import com.mysite.career.review.resume.constant.ResumeVisibility;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -19,6 +22,13 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
 
     Page<Resume> findAll(Specification<Resume> specification, Pageable pageable);
 
+    Page<Resume> findByAuthor(User author, Pageable pageable);
+
+    @Query("SELECT r FROM Resume r WHERE r.author = :author AND r.version = (SELECT MAX(r2.version) FROM Resume r2 WHERE r2.application = r.application)")
+    Page<Resume> findLatestByAuthor(@Param("author") User author, Pageable pageable);
+    
+    Page<Resume> findByVisibility(ResumeVisibility visibility, Pageable pageable);
+
     @Query(value =
             "SELECT distinct q "
             + "FROM Resume q "
@@ -30,7 +40,8 @@ public interface ResumeRepository extends JpaRepository<Resume, Long> {
             + "OR m1.username LIKE %:keyword% "
             + "OR m2.username LIKE %:keyword% "
             + "OR f.content LIKE %:keyword%) "
-            + "AND q.version = (SELECT MAX(r2.version) FROM Resume r2 WHERE r2.application = q.application)"
+            + "AND q.version = (SELECT MAX(r2.version) FROM Resume r2 WHERE r2.application = q.application) "
+            + "AND q.visibility = com.mysite.career.review.resume.constant.ResumeVisibility.PUBLIC"
             , nativeQuery = false)
     Page<Resume> findAllByKeyword(String keyword, Pageable pageable);
 }

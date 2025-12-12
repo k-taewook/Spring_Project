@@ -37,6 +37,7 @@ import com.mysite.career.review.resume.dto.ResumeEducationDto;
 import com.mysite.career.review.resume.dto.ResumeProjectDto;
 import com.mysite.career.review.resume.dto.ResumeSkillDto;
 import com.mysite.career.review.resume.entity.ResumeSelfIntro;
+import com.mysite.career.review.resume.constant.ResumeVisibility;
 import java.util.stream.Collectors;
 
 @Controller
@@ -106,6 +107,7 @@ public class ResumeController {
         resumeDto.setContent(resume.getContent());
         resumeDto.setTargetCompany(resume.getTargetCompany());
         resumeDto.setStatus(resume.getStatus());
+        resumeDto.setVisibility(resume.getVisibility());
         
         // 자소서 항목 DTO 변환
         if (resume.getSelfIntroList() != null) {
@@ -275,5 +277,25 @@ public class ResumeController {
         resumeService.create(resumeDto, user);
 
         return "redirect:/resume/list";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/my")
+    public String myResumes(Model model, @RequestParam(value = "page", defaultValue = "0") int page, Principal principal) {
+        User user = userService.getUser(principal.getName());
+        Page<Resume> paging = resumeService.getMyResumes(page, user);
+        model.addAttribute("paging", paging);
+        return "resume/my_list";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/visibility/{id}")
+    public String updateVisibility(@PathVariable("id") Long id, @RequestParam("visibility") ResumeVisibility visibility, Principal principal) {
+        Resume resume = resumeService.getResume(id);
+        if(!resume.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
+        }
+        resumeService.updateVisibility(id, visibility);
+        return "redirect:/resume/detail/" + id;
     }
 }

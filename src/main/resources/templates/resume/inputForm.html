@@ -59,6 +59,13 @@
                                             <option value="COMPLETED">첨삭완료</option>
                                         </select>
                                     </div>
+                                    <div class="col-md-6 mt-3">
+                                        <label for="visibility" class="form-label fw-bold">공개 여부</label>
+                                        <select class="form-select" id="visibility" name="visibility" th:field="*{visibility}">
+                                            <option value="PUBLIC">공개</option>
+                                            <option value="PRIVATE">비공개</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <!-- 기술 스택 (Skills) -->
@@ -102,11 +109,11 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">시작일</label>
-                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].startDate|" th:value="${project.startDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|projectList[${stat.index}].startDate|" th:value="${project.startDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">종료일</label>
-                                                    <input type="text" class="form-control" th:name="|projectList[${stat.index}].endDate|" th:value="${project.endDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|projectList[${stat.index}].endDate|" th:value="${project.endDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-12">
                                                     <label class="form-label fw-bold">설명</label>
@@ -147,11 +154,11 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">입사일</label>
-                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].startDate|" th:value="${career.startDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|careerList[${stat.index}].startDate|" th:value="${career.startDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">퇴사일</label>
-                                                    <input type="text" class="form-control" th:name="|careerList[${stat.index}].endDate|" th:value="${career.endDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|careerList[${stat.index}].endDate|" th:value="${career.endDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-12">
                                                     <label class="form-label fw-bold">담당 업무</label>
@@ -184,11 +191,11 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">입학일</label>
-                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].startDate|" th:value="${edu.startDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|educationList[${stat.index}].startDate|" th:value="${edu.startDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">졸업일</label>
-                                                    <input type="text" class="form-control" th:name="|educationList[${stat.index}].endDate|" th:value="${edu.endDate}" placeholder="YYYY-MM">
+                                                    <input type="month" class="form-control" th:name="|educationList[${stat.index}].endDate|" th:value="${edu.endDate}" placeholder="YYYY-MM">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label fw-bold">상태</label>
@@ -425,11 +432,11 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">시작일</label>
-                                <input type="text" class="form-control" name="projectList[${index}].startDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="projectList[${index}].startDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">종료일</label>
-                                <input type="text" class="form-control" name="projectList[${index}].endDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="projectList[${index}].endDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">설명</label>
@@ -467,11 +474,11 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">입사일</label>
-                                <input type="text" class="form-control" name="careerList[${index}].startDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="careerList[${index}].startDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">퇴사일</label>
-                                <input type="text" class="form-control" name="careerList[${index}].endDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="careerList[${index}].endDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">담당 업무</label>
@@ -501,11 +508,11 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">입학일</label>
-                                <input type="text" class="form-control" name="educationList[${index}].startDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="educationList[${index}].startDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">졸업일</label>
-                                <input type="text" class="form-control" name="educationList[${index}].endDate" placeholder="YYYY-MM">
+                                <input type="month" class="form-control" name="educationList[${index}].endDate" placeholder="YYYY-MM">
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label fw-bold">상태</label>

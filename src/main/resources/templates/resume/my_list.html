@@ -1,0 +1,97 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<div layout:fragment="content" class="container my-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="bi bi-person-badge me-2 text-primary"></i>내 이력서 관리
+            </h2>
+            <p class="text-muted mt-1 mb-0">내가 작성한 이력서를 관리하고 공개 여부를 설정하세요.</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a th:href="@{/resume/create}" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i>새 이력서 작성
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <!-- 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th style="width: 5%">번호</th>
+                            <th style="width: 10%">상태</th>
+                            <th style="width: 10%">공개 여부</th>
+                            <th style="width: 15%">목표 기업</th>
+                            <th style="width: 45%">제목</th>
+                            <th style="width: 15%">등록일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="resume, loop : ${paging}">
+                            <td class="text-center text-muted" th:text="${paging.getTotalElements - (paging.size * paging.number) - loop.index}"></td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary" 
+                                      th:if="${resume.status.name() == 'WAITING'}" th:text="${resume.status.description}"></span>
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success" 
+                                      th:if="${resume.status.name() == 'COMPLETED'}" th:text="${resume.status.description}"></span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill" 
+                                      th:classappend="${resume.visibility.name() == 'PUBLIC'} ? 'bg-primary' : 'bg-secondary'"
+                                      th:text="${resume.visibility.description}"></span>
+                            </td>
+                            <td class="text-center fw-medium text-dark" th:text="${resume.targetCompany}"></td>
+                            <td>
+                                <a th:href="@{|/resume/detail/${resume.id}|}" class="text-decoration-none text-dark fw-bold d-block text-truncate" style="max-width: 400px;">
+                                    <span th:text="${resume.subject}"></span>
+                                    <span class="badge bg-danger rounded-pill ms-1" th:if="${#lists.size(resume.feedbackList) > 0}"
+                                          th:text="${#lists.size(resume.feedbackList)}">
+                                    </span>
+                                </a>
+                            </td>
+                            <td class="text-center text-muted small" th:text="${#temporals.format(resume.created, 'yyyy-MM-dd HH:mm')}"></td>
+                        </tr>
+                        <tr th:if="${paging.isEmpty()}">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                                등록된 이력서가 없습니다.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이징 -->
+            <div th:if="${!paging.isEmpty()}" class="mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center pagination-sm">
+                        <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                            <a class="page-link rounded-circle mx-1 border-0 bg-light text-dark" th:href="@{|?page=${paging.number-1}|}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                            th:if="${page >= paging.number-2 and page <= paging.number+2}"
+                            th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                            <a th:text="${page + 1}" class="page-link rounded-circle mx-1 border-0" 
+                               th:classappend="${page == paging.number} ? 'bg-primary text-white shadow-sm' : 'bg-light text-dark'"
+                               th:href="@{|?page=${page}|}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                            <a class="page-link rounded-circle mx-1 border-0 bg-light text-dark" th:href="@{|?page=${paging.number+1}|}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

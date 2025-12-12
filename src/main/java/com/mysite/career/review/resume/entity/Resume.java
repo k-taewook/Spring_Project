@@ -4,6 +4,7 @@ import com.mysite.career.review.audit.BaseEntity;
 import com.mysite.career.review.feedback.entity.Feedback;
 import com.mysite.career.review.user.entity.User;
 import com.mysite.career.review.resume.constant.ResumeStatus;
+import com.mysite.career.review.resume.constant.ResumeVisibility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -77,6 +78,14 @@ public class Resume extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private ResumeStatus status; // 진행 상태
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ResumeVisibility visibility = ResumeVisibility.PUBLIC;
+
+    public ResumeVisibility getVisibility() {
+        return visibility == null ? ResumeVisibility.PUBLIC : visibility;
+    }
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "resume", cascade = CascadeType.ALL)

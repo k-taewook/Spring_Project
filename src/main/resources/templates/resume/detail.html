@@ -11,6 +11,9 @@
             <div class="mb-4">
                 <div class="d-flex align-items-center mb-2">
                     <span class="badge bg-primary me-2" th:if="${resume.status != null}" th:text="${resume.status.description}"></span>
+                    <span class="badge me-2" 
+                          th:classappend="${resume.visibility.name() == 'PUBLIC' ? 'bg-info' : 'bg-secondary'}"
+                          th:text="${resume.visibility.description}"></span>
                     <span class="text-muted small" th:text="|v${resume.version}|">v1</span>
                 </div>
                 <h2 class="fw-bold text-dark mb-3" th:text="${resume.subject}">이력서 제목</h2>
@@ -51,11 +54,22 @@
                     <div class="mb-4" th:if="${!#lists.isEmpty(resume.skillList)}">
                         <h5 class="fw-bold text-primary mb-3"><i class="bi bi-tools me-2"></i>기술 스택</h5>
                         <div class="d-flex flex-wrap gap-2">
-                            <span th:each="skill : ${resume.skillList}" class="badge bg-light text-dark border p-2">
-                                <i class="bi bi-code-slash me-1"></i>
-                                <span th:text="${skill.skillName}">Java</span>
-                                <span class="badge bg-secondary ms-1" th:text="${skill.level}">상</span>
-                            </span>
+                            <div th:each="skill : ${resume.skillList}" 
+                                 class="d-flex align-items-center border rounded-pill px-3 py-2 bg-white shadow-sm"
+                                 th:classappend="${skill.level == '상' ? 'border-primary' : (skill.level == '중' ? 'border-success' : 'border-secondary')}">
+                                
+                                <!-- Icon based on level -->
+                                <i class="bi me-2" 
+                                   th:classappend="${skill.level == '상' ? 'bi-star-fill text-primary' : (skill.level == '중' ? 'bi-check-circle-fill text-success' : 'bi-circle-fill text-secondary')}"></i>
+                                
+                                <!-- Skill Name -->
+                                <span class="fw-bold me-2" th:text="${skill.skillName}">Java</span>
+                                
+                                <!-- Level Badge -->
+                                <span class="badge rounded-pill" 
+                                      th:classappend="${skill.level == '상' ? 'bg-primary' : (skill.level == '중' ? 'bg-success' : 'bg-secondary')}"
+                                      th:text="${skill.level}">상</span>
+                            </div>
                         </div>
                     </div>
 
@@ -175,6 +189,18 @@
 
             <!-- 버튼 그룹 -->
             <div class="d-flex justify-content-end mb-5">
+                <!-- Visibility Toggle Form -->
+                <form th:action="@{|/resume/visibility/${resume.id}|}" method="post" class="d-inline"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${resume.author != null and (#authentication.getPrincipal().getUsername() == resume.author.username)}">
+                    <input type="hidden" name="visibility" th:value="${resume.visibility.name() == 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'}">
+                    <button type="submit" class="btn me-2" 
+                            th:classappend="${resume.visibility.name() == 'PUBLIC' ? 'btn-outline-secondary' : 'btn-outline-success'}">
+                        <i class="bi" th:classappend="${resume.visibility.name() == 'PUBLIC' ? 'bi-lock-fill' : 'bi-globe'}"></i>
+                        <span th:text="${resume.visibility.name() == 'PUBLIC' ? '비공개로 전환' : '공개로 전환'}"></span>
+                    </button>
+                </form>
+
                 <a th:href="@{|/resume/modify/${resume.id}|}"
                    class="btn btn-primary me-2"
                    sec:authorize="isAuthenticated()"

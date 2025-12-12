@@ -1,6 +1,7 @@
 package com.mysite.career.review.resume.dto;
 
 import com.mysite.career.review.resume.constant.ResumeStatus;
+import com.mysite.career.review.resume.constant.ResumeVisibility;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,9 @@ public class ResumeDto {
     private String targetCompany;
 
     private ResumeStatus status;
+
+    @Builder.Default
+    private ResumeVisibility visibility = ResumeVisibility.PUBLIC;
 
     private Long id;
 
