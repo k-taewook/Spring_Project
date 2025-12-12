@@ -41,7 +41,24 @@ src/main/java/com/mysite/career/review
 └── config          # Security 등 설정 파일
 ```
 
-## 📝 실행 방법
+## � 데이터베이스 구조 (Database Schema)
+
+이 프로젝트는 **Git과 유사한 버전 관리 시스템**을 구현하기 위해 다음과 같은 데이터 구조를 가집니다.
+
+### 핵심 엔티티 관계
+1. **Application (1) : Resume (N)**
+   - `Application`은 하나의 이력서 주제(예: "삼성전자 지원")를 나타내는 컨테이너입니다.
+   - `Resume`는 그 주제 안에서 수정될 때마다 생성되는 **버전(Snapshot)**입니다.
+   - 이를 통해 사용자는 이력서의 과거 수정 내역을 모두 보존하고 조회할 수 있습니다.
+
+2. **Resume (1) : 세부 항목 (N)**
+   - 하나의 이력서는 여러 개의 경력, 학력, 프로젝트, 스킬, 자기소개서 항목을 가집니다.
+   - `ResumeCareer`, `ResumeEducation`, `ResumeProject`, `ResumeSkill`, `ResumeSelfIntro` 테이블로 정규화되어 있습니다.
+
+3. **Resume (1) : Feedback (N)**
+   - 사용자는 특정 버전의 이력서에 대해 피드백을 남길 수 있습니다.
+
+## �📝 실행 방법
 
 1. 프로젝트 클론
    ```bash
